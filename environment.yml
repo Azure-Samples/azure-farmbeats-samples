@@ -1,0 +1,7 @@
+name: farmbeats-sdk-env
+
+dependencies:
+  - python=3.6.9
+  - numpy
+  - pandas
+  - rasterio
