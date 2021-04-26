@@ -128,5 +128,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Config files
-.config.py
+### VisualStudioCode ###
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
