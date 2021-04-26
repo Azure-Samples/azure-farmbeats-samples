@@ -5,12 +5,12 @@ FarmBeats registered farmer details
 """
 
 farmbeats_config = {
-    "client_id": "66573d41-b90a-426f-b137-667207390edc",
-    "client_secret": "L_Z6nrw-dy0qHj1A4c-dIm1YE4YZ.B.~z-",
+    "client_id": "640027d7-3e96-49fc-8ecf-775f47a1e7b8",
+    "client_secret": "rC.NHz~YPJn_xKGMh-OTg3M4P2kn6EbI90",
     "authority": "https://login.windows-ppe.net",
     "default_scope": "https://farmbeats-dogfood.azure.net/.default",
-    "instance_url": "https://bb-df-wus2-1.farmbeats-dogfood.azure.net/",
-    "tenant_id": "556b0c04-d33e-48d0-9f6f-f893c8c77e00",
+    "instance_url": "https://agadhibjs-one.farmbeats-dogfood.azure.net",
+    "tenant_id": "e21b7e4f-4b6c-4ead-bb26-b615da83f381",
     "weather_provider_key": "c743a0f0d236e4115aef962a1eed0709",
     "weather_provider_id": "95615ca0",
 }

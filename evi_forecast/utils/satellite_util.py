@@ -32,7 +32,8 @@ class SatelliteUtil:
 
 
     def download_image(self, file_link, root_dir):
-        print(f"Downloading image {file_link}... ", end="", flush=True)
+        #print(f"Downloading image {file_link}... ", end="", flush=True)
+        #print(".....")
         file_path = self.parse_file_path_from_file_link(file_link)
         out_path = Path(os.path.join(root_dir, file_path))
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -45,8 +46,8 @@ class SatelliteUtil:
     def download_scenes(self, boundary, start_date_time, end_date_time, root_dir):
         
         scenes = self.farmbeats_client.scenes.list(
-            "annam_farmer",
-            "boundary0102",
+            boundary.farmer_id,
+            boundary.id,
             start_date_time=start_date_time,
             end_date_time=end_date_time,
         )
@@ -88,45 +89,6 @@ class SatelliteUtil:
         except Exception as e:
             print(e)
 
-
-    def queue_satellite_job(
-        self,
-        farmer_id, 
-        boundary_id, 
-        job_id, 
-        start_date_time, 
-        end_date_time, 
-        polling
-    ):
-        try:
-            print("Queuing satellite job... ", end="", flush=True)
-            satellite_job = self.farmbeats_client.scenes.begin_create_satellite_data_ingestion_job(
-                job_id=job_id,
-                job=SatelliteIngestionJobRequest(
-                    farmer_id=farmer_id,
-                    boundary_id=boundary_id,
-                    start_date_time=start_date_time,
-                    end_date_time=end_date_time,
-                ),
-                polling=polling
-            )
-            """
-            if polling:
-                print("Waiting for result... ", end="", flush=True)
-                result = satellite_job.result()
-                print(f"Done with status {satellite_job.status()}")
-                return result
-            else:
-            """
-            print("Submitted Satellite Job")
-            return satellite_job
-                
-        except HttpResponseError as e:
-            print(e)
-            raise
-        #TODO: Save Failed Job IDs with Job Request Details
-
-
     def download_and_get_sat_file_paths(
         self, 
         farmer_id, 
@@ -140,12 +102,12 @@ class SatelliteUtil:
         """
         Downloads scenes (all bands) to local and gets the local paths saved to file
         """
-        
+        print("Downloading Images to Local ...")
         all_scenes = []
         for boundary in boundaries:
             scenes = self.download_scenes(boundary, start_date_time, end_date_time, root_dir)
             all_scenes.append(scenes)
-
+        print("Finished Downloading!!")
         """
         if np.sum([len(x) for x in all_scenes]) == 0:
             raise ValueError("No scenes found between "+ start_dt.strftime("%Y-%m-%d") + " and " + end_dt.strftime("%Y-%m-%d"))
