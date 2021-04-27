@@ -59,36 +59,6 @@ class SatelliteUtil:
         
         return scenes_2
 
-
-    def create_boundary(self, farmer_id, boundary_id, bbox):
-        try:
-            boundary = self.farmbeats_client.boundaries.get(
-                farmer_id=farmer_id,
-                boundary_id=boundary_id
-            )
-            
-            if boundary is not None:
-                print("Exist")
-                return boundary
-            else:
-                print(f"Creating boundary with id {boundary_id}... ", end="")
-                boundary = self.farmbeats_client.boundaries.create_or_update(
-                    farmer_id=farmer_id,
-                    boundary_id=boundary_id,
-                    boundary=Boundary(
-                        description="Created by SDK",
-                        geometry=Polygon(
-                            coordinates=[
-                            bbox
-                            ]
-                        )
-                    )
-                )
-            print("Done")
-            return boundary
-        except Exception as e:
-            print(e)
-
     def download_and_get_sat_file_paths(
         self, 
         farmer_id, 
@@ -107,7 +77,6 @@ class SatelliteUtil:
         for boundary in boundaries:
             scenes = self.download_scenes(boundary, start_date_time, end_date_time, root_dir)
             all_scenes.append(scenes)
-        print("Finished Downloading!!")
         """
         if np.sum([len(x) for x in all_scenes]) == 0:
             raise ValueError("No scenes found between "+ start_dt.strftime("%Y-%m-%d") + " and " + end_dt.strftime("%Y-%m-%d"))
@@ -132,13 +101,13 @@ class SatelliteUtil:
             + '" and resolution == 10 and cloudCoverPercentage == 0 and darkPixelPercentage < .1'
         )
 
-        df_allscenes_band["boundary_count"] = df_allscenes_band.groupby(
+        df_allscenes_band.loc[:, 'boundary_count'] = df_allscenes_band.groupby(
             "boundaryId"
         ).name.transform(len)
 
-        df_allscenes_band["filePath"] = [
+        df_allscenes_band.loc[:, 'filePath'] = [
         os.path.normpath(self.download_image(x,root_dir))
         for x in df_allscenes_band.fileLink.values
         ]
-
+        print("Finished Downloading!!")
         return df_allscenes_band

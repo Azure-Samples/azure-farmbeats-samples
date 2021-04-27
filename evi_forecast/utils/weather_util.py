@@ -4,7 +4,6 @@ import json
 #3rd Party Imports
 import numpy as np
 import pandas as pd
-from pandas.io.json import json_normalize
 
 class WeatherUtil:
     """
@@ -23,7 +22,7 @@ class WeatherUtil:
             return
                 
         # Flatten out the json to a big data frame
-        df_flat = pd.io.json.json_normalize([x.serialize() for x in weather_data])   
+        df_flat = pd.json_normalize([x.serialize() for x in weather_data])   
         df_flat_proceesed = df_flat.drop(columns=df_flat.columns[(df_flat == "n/a").any()]) # n/a string are present in ClearAg response
         # Rename columns with unit and drop these columns afterwards
         unit_cols= [col for col in df_flat_proceesed.columns if col.endswith('unit')]
