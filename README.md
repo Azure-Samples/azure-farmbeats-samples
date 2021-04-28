@@ -10,7 +10,7 @@ urlFragment: azure-farmbeats-samples
 
 # Microsoft Azure Farmbeats Samples (ML Models) for Python 
 
-This contains end to end Python samples/ jupyter notebooks starting from creating farm, boundary, ingesting satelltite and weather data and building ML models realted to AgriFood Applicatios. It also contains a set of utilities helps in data processing.
+This template contains end to end Python samples/ jupyter notebooks which demonstrate creating farms, boundaries, ingesting satellite and weather data and building ML models related to AgriFood Applications. It also contains a set of utilities helps in data processing.
 
 ## Features
 
