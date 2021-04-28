@@ -4,7 +4,7 @@ languages:
 - python
 products:
 - azure
-description: "This contains Python samples for building ML models using Azure Farmbeats python SDK."
+description: "This repository contains Python samples for building ML models using Azure Farmbeats python SDK."
 urlFragment: azure-farmbeats-samples
 ---
 
