@@ -80,7 +80,7 @@ trainval = (
 )
 
 
-trainval["w_exists"] = (CONSTANTS["weather_data_fldr"] + trainval["boundaryId"] + "_historical.csv").apply(
+trainval["weather_data_exists"] = (CONSTANTS["weather_data_fldr"] + trainval["boundaryId"] + "_historical.csv").apply(
     os.path.exists
 )
 
@@ -290,5 +290,4 @@ plt.suptitle(
     + str(np.round(np.sqrt(history1.history["val_mse"][-1]), 4))
 )
 plt.savefig(CONSTANTS["model_result_png"])
-
 
