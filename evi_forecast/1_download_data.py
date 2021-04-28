@@ -89,7 +89,7 @@ locations_df["farms1"] = locations_df.farms.apply(json.loads)  # farm geojsons c
 # %%
 boundaries = [] # List of boundaries
 
-for i, item in enumerate(locations_df.farms1.values[:NO_BOUNDARIES]):
+for i, boundary_polygon in enumerate(locations_df.farm_boundaries.values[:NO_BOUNDARIES]):
     boundary_id="boundary" + str(i) + str(RUN)
     try:
         boundary = fb_client.boundaries.get(
@@ -309,5 +309,4 @@ for boundary in boundaries:
 
     w_df = WeatherUtil.get_weather_data_df(weather_data)
     w_df.to_csv(boundary.id + "_forecast.csv", index=False)
-
 
