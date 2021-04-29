@@ -80,7 +80,7 @@ root_dir = "/home/temp/"
 
 
 # %%
-sat_links1 = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
+satellite_links = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
 
 # get last available data of satellite data
 end_dt_w = datetime.strptime(
@@ -236,5 +236,4 @@ for coln in tmp_df.columns[:-2]:
     #show_hist(src)
     display.clear_output(wait=True)
     time.sleep(1)  
-
 
