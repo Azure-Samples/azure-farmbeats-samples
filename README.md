@@ -27,17 +27,20 @@ EVI-Forecast:
 ## Getting Started
 
 ### Prerequisites
-1. An Azure Farmbeats Resource. If you don't have an Azure Farmbeats Resource, create one before you begin
+1. An Azure Farmbeats Resource. If you don't have an Azure Farmbeats Resource, create one before you begin. 
+2. Follow steps here to create Azure Farmnbeats Resource
+3. Get FarmBeats Credentials (client id, client secret, instance url)
+3. Get Credentials (APP_ID, APP_KEY) of Weather Provider
 
 
 ### Installation
-
+1. First create [AML Compute](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-attach-compute-studio) 
 
 ### Quickstart
-1. git clone https://github.com/Azure-Samples/azure-farmbeats-samples
-2. cd azure-farmbeats-samples
-3. ...
-
+1. Launch the terminal of AML compute
+2. git clone https://github.com/Azure-Samples/azure-farmbeats-samples
+3. Go "Notebooks" pane and go to your username and click folder "azure-farmbeats-samples"
+4. Go to evi_forecast/1_download_data.ipynb
 
 ## Contributing
 This project doesn't accept contributions and suggestions at this moment!

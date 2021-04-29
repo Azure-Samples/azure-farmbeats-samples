@@ -1,14 +1,15 @@
-# Local Imports
+# Standard library imports
+import os
+from itertools import tee
+from pathlib import Path
+from urllib.parse import urlparse, parse_qs
+
+# Third party imports
+import pandas as pd
+
+# Library specific imports
 from azure.core.exceptions import HttpResponseError
 from azure.farmbeats import FarmBeatsClient
-
-
-# 3rd part Imports
-import os
-from pathlib import Path
-import pandas as pd
-from urllib.parse import urlparse, parse_qs
-from itertools import tee
 
 
 class SatelliteUtil:
@@ -17,14 +18,6 @@ class SatelliteUtil:
     def __init__(self, farmbeats_client: FarmBeatsClient):
         self.farmbeats_client = farmbeats_client
     
-    def print_error(exception):
-        print("Error:")
-        try:
-            print(exception.model.as_dict())
-        except:
-            print(exception.response.body())
-            print("Couldn't print error info")
-
     def parse_file_path_from_file_link(self, file_link):
         return parse_qs(urlparse(file_link).query)['filePath'][0]
 
@@ -101,8 +94,8 @@ class SatelliteUtil:
         ).name.transform(len)
 
         df_allscenes_band.loc[:, 'filePath'] = [
-            os.path.normpath(self.download_image(x, root_dir))
+            Path(os.path.join(root_dir, self.parse_file_path_from_file_link(x)))
             for x in df_allscenes_band.fileLink.values
         ]
-        print("Finished Downloading!!")
+        print("Finished Downloading!")
         return df_allscenes_band
