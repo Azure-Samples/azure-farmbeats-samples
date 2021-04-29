@@ -37,6 +37,7 @@ from utils.constants import CONSTANTS
 
 # %%
 # FarmBeats Client definition
+# Please make sure to change default values in config.py
 credential = ClientSecretCredential(
     tenant_id=farmbeats_config['tenant_id'],
     client_id=farmbeats_config['client_id'],
@@ -309,4 +310,3 @@ for boundary in boundaries:
 
     w_df = WeatherUtil.get_weather_data_df(weather_data)
     w_df.to_csv(boundary.id + "_forecast.csv", index=False)
-
