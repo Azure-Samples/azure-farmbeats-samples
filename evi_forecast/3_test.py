@@ -197,7 +197,7 @@ label_names = [
 ]
 
 
-tmp_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
+label_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
     lat=ard.lat_.values, long=ard.long_.values
 )
 
@@ -236,4 +236,3 @@ for coln in tmp_df.columns[:-2]:
     #show_hist(src)
     display.clear_output(wait=True)
     time.sleep(1)  
-
