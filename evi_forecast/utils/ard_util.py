@@ -2,10 +2,12 @@ import json
 import numpy as np
 import os
 import pandas as pd
-from statsmodels.nonparametric.smoothers_lowess import lowess
 import rasterio
 import xarray as xr
+
 from datetime import datetime, timedelta
+from statsmodels.nonparametric.smoothers_lowess import lowess
+
 
 def ard_preprocess(
     sat_links1,
@@ -21,6 +23,10 @@ def ard_preprocess(
     w_mn,
     w_sd,
 ):
+
+    """
+    This method takes boundary satellite paths and weather data, creates Analysis Ready DataSet (ARD) 
+    """
     sat_links1["sat_data"] = [
         rasterio.open(x).read(1) for x in sat_links1.filePath.values
     ]

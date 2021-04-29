@@ -8,14 +8,12 @@
 
 # %%
 import json
-import numpy as np
-import os
 import pandas as pd
-import rasterio
+from azure.core.exceptions import HttpResponseError
 from azure.identity import ClientSecretCredential
-from datetime import datetime, timedelta
+from datetime import datetime
 
-# Disable unnecessary logs 
+# Disable unnecessary logs
 import sys
 import logging
 logging.disable(sys.maxsize)
@@ -24,8 +22,10 @@ logging.disable(sys.maxsize)
 # ### Import Farmbeats and Utilities
 
 # %%
-from azure.farmbeats.models import Farmer, Boundary, Polygon, SatelliteIngestionJobRequest, WeatherIngestionJobRequest
 from azure.farmbeats import FarmBeatsClient
+from azure.farmbeats.models import (Farmer, Boundary, Polygon,
+                                    SatelliteIngestionJobRequest,
+                                    WeatherIngestionJobRequest)
 
 from utils.config import farmbeats_config
 from utils.weather_util import WeatherUtil
@@ -56,9 +56,9 @@ fb_client = FarmBeatsClient(
 
 
 # %%
-RUN = 62
-NO_BOUNDARIES = 2
-root_dir = "/home/temp/" # Satellite data gets downloaded here
+RUN = 62  # This Variable helps in creating unique job id everytime you run
+NO_BOUNDARIES = 2  # Defaults 50;
+root_dir = "/home/temp/"  # Satellite data gets downloaded here
 
 # %% [markdown]
 # ### Create Farmer
@@ -88,10 +88,10 @@ locations_df["farms1"] = locations_df.farms.apply(json.loads)  # farm geojsons c
 
 
 # %%
-boundaries = [] # List of boundaries
+boundaries = []  # List of boundaries
 
 for i, boundary_polygon in enumerate(locations_df.farm_boundaries.values[:NO_BOUNDARIES]):
-    boundary_id="boundary" + str(i) + str(RUN)
+    boundary_id = "boundary" + str(i) + str(RUN)
     try:
         boundary = fb_client.boundaries.get(
             farmer_id=farmer_id,
@@ -108,7 +108,7 @@ for i, boundary_polygon in enumerate(locations_df.farm_boundaries.values[:NO_BOU
                     description="Created by SDK",
                     geometry=Polygon(
                         coordinates=[
-                        item
+                            boundary_polygon
                         ]
                     )
                 )
@@ -162,8 +162,7 @@ for sat_job in satellite_jobs:
 
 for sat_job in satellite_jobs:
     print(sat_job.result().as_dict()['id'])
-    print(sat_job.status())
-    
+    print(sat_job.status())   
 # TODO: Save job ids with Job request body to track failed jobs if any!
 
 # %% [markdown]
@@ -180,10 +179,9 @@ extension_data_provider_app_id = farmbeats_config["weather_provider_id"]
 # %%
 weather_jobs = []
 for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
-    job_id = "weatherjob"+ str(i) + str(RUN)
+    job_id = "weatherjob" + str(i) + str(RUN)
     st_unix = int(start_dt.timestamp())
     ed_unix = int(end_dt.timestamp())
-    
     try:
         print("Queuing weather job... ", end="", flush=True)
         weather_job = fb_client.weather.begin_create_data_ingestion_job(
@@ -191,10 +189,10 @@ for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
             job=WeatherIngestionJobRequest(
                 farmer_id=boundary.farmer_id,
                 boundary_id=boundary.id,
-                extension_id= extension_id, 
-                extension_api_name= extension_api_name, 
-                extension_api_input= {"start": st_unix, "end": ed_unix},
-                extension_data_provider_api_key= extension_data_provider_api_key,
+                extension_id=extension_id, 
+                extension_api_name=extension_api_name, 
+                extension_api_input={"start": st_unix, "end": ed_unix},
+                extension_data_provider_api_key=extension_data_provider_api_key,
                 extension_data_provider_app_id=extension_data_provider_app_id
             ),
             polling=True
@@ -237,10 +235,10 @@ for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
             job=WeatherIngestionJobRequest(
                 farmer_id=boundary.farmer_id,
                 boundary_id=boundary.id,
-                extension_id= extension_id, 
-                extension_api_name= extension_api_name, 
-                extension_api_input= {"start": START, "end": END},
-                extension_data_provider_api_key= extension_data_provider_api_key,
+                extension_id=extension_id,
+                extension_api_name=extension_api_name,
+                extension_api_input={"start": START, "end": END},
+                extension_data_provider_api_key=extension_data_provider_api_key,
                 extension_data_provider_app_id=extension_data_provider_app_id
             ),
             polling=True
@@ -269,10 +267,10 @@ for wth_job in weather_forecast_jobs:
 # ### Download Satellite Data to Local
 
 # %%
-df = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, boundaries, 
-                                                                              start_dt, 
-                                                                              end_dt, 
-                                                                              root_dir)
+df = SatelliteUtil(farmbeats_client=fb_client).download_and_get_sat_file_paths(farmer_id, boundaries,
+                                                                            start_dt,
+                                                                            end_dt,
+                                                                            root_dir)
 df.to_csv("satellite_paths.csv", index=None)
 
 # %% [markdown]
@@ -281,10 +279,10 @@ df.to_csv("satellite_paths.csv", index=None)
 # %%
 for boundary in boundaries:
     weather_list = fb_client.weather.list(
-            farmer_id=  boundary.farmer_id,
-            boundary_id= boundary.id,
-            extension_id="dtn.clearAg", 
-            weather_data_type= "historical", 
+            farmer_id=boundary.farmer_id,
+            boundary_id=boundary.id,
+            extension_id="dtn.clearAg",
+            weather_data_type="historical",
             granularity="daily")
 
     weather_data = []
@@ -298,10 +296,10 @@ for boundary in boundaries:
 # %%
 for boundary in boundaries:
     weather_list = fb_client.weather.list(
-            farmer_id=  boundary.farmer_id,
-            boundary_id= boundary.id,
+            farmer_id=boundary.farmer_id,
+            boundary_id=boundary.id,
             extension_id="dtn.clearAg", 
-            weather_data_type= "forecast", 
+            weather_data_type="forecast", 
             granularity="daily")
 
     weather_data = []

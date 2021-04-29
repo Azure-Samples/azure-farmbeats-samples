@@ -1,20 +1,18 @@
 # Local Imports
-from azure.farmbeats import FarmBeatsClient
-from azure.farmbeats.models import Boundary, Polygon, SatelliteIngestionJobRequest
 from azure.core.exceptions import HttpResponseError
+from azure.farmbeats import FarmBeatsClient
+
 
 # 3rd part Imports
 import os
 from pathlib import Path
-import numpy as np
 import pandas as pd
-from urllib.parse import unquote, urlparse, parse_qs
+from urllib.parse import urlparse, parse_qs
 from itertools import tee
 
+
 class SatelliteUtil:
-    """
-    provides utility functions for the satellite data
-    """
+    """provides utility functions for the satellite data."""
 
     def __init__(self, farmbeats_client: FarmBeatsClient):
         self.farmbeats_client = farmbeats_client
@@ -22,7 +20,7 @@ class SatelliteUtil:
     def print_error(exception):
         print("Error:")
         try:
-            pprint(exception.model.as_dict())
+            print(exception.model.as_dict())
         except:
             print(exception.response.body())
             print("Couldn't print error info")
@@ -30,10 +28,7 @@ class SatelliteUtil:
     def parse_file_path_from_file_link(self, file_link):
         return parse_qs(urlparse(file_link).query)['filePath'][0]
 
-
     def download_image(self, file_link, root_dir):
-        #print(f"Downloading image {file_link}... ", end="", flush=True)
-        #print(".....")
         file_path = self.parse_file_path_from_file_link(file_link)
         out_path = Path(os.path.join(root_dir, file_path))
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -43,8 +38,8 @@ class SatelliteUtil:
                 tif_file.write(bits)
         return out_path
 
-    def download_scenes(self, boundary, start_date_time, end_date_time, root_dir):
-        
+    def download_scenes(self,
+                        boundary, start_date_time, end_date_time, root_dir):   
         scenes = self.farmbeats_client.scenes.list(
             boundary.farmer_id,
             boundary.id,
@@ -55,22 +50,22 @@ class SatelliteUtil:
 
         for scene in scenes:
             for image_file in scene.image_files:
-                self.download_image(image_file.file_link, root_dir)
-        
+                self.download_image(image_file.file_link, root_dir)      
         return scenes_2
 
     def download_and_get_sat_file_paths(
-        self, 
-        farmer_id, 
-        boundaries, 
-        start_date_time, 
-        end_date_time, 
-        root_dir, 
-        band_name = "NDVI"
+        self,
+        farmer_id,
+        boundaries,
+        start_date_time,
+        end_date_time,
+        root_dir,
+        band_name="NDVI"
     ):
 
         """
-        Downloads scenes (all bands) to local and gets the local paths saved to file
+        Downloads scenes (all bands) to local and
+        gets the local paths saved to file
         """
         print("Downloading Images to Local ...")
         all_scenes = []
@@ -106,8 +101,8 @@ class SatelliteUtil:
         ).name.transform(len)
 
         df_allscenes_band.loc[:, 'filePath'] = [
-        os.path.normpath(self.download_image(x,root_dir))
-        for x in df_allscenes_band.fileLink.values
+            os.path.normpath(self.download_image(x, root_dir))
+            for x in df_allscenes_band.fileLink.values
         ]
         print("Finished Downloading!!")
         return df_allscenes_band

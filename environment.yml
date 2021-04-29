@@ -5,3 +5,5 @@ dependencies:
   - numpy
   - pandas
   - rasterio
+  -pip:
+      - azure-farmbeats
