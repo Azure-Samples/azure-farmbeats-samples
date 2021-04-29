@@ -10,6 +10,7 @@ farmbeats_config = {
     "default_scope": "",
     "instance_url": "",
     "tenant_id": "",
+    "weather_provider_extension_id": "",
     "weather_provider_key": "",
     "weather_provider_id": "",
 }
