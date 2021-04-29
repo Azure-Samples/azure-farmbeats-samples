@@ -19,23 +19,19 @@ import numpy as np
 import pandas as pd
 import rasterio
 import tensorflow as tf
+from azure.identity import ClientSecretCredential
 from tensorflow import keras
 
-
-# Local / libray specific Imports
-from azure.identity import ClientSecretCredential
-from azure.farmbeats.models import Farmer, Boundary, Polygon, SatelliteIngestionJobRequest, WeatherIngestionJobRequest
-from azure.farmbeats import FarmBeatsClient
+# Local imports
 from utils.config import farmbeats_config
 from utils.weather_util import WeatherUtil
 from utils.satellite_util import SatelliteUtil
 from utils.constants import CONSTANTS
 from utils.ard_util import ard_preprocess
 
-# Disable unnecessary logs
-import sys
-import logging
-logging.disable(sys.maxsize)
+# SDK imports
+from azure.farmbeats.models import Farmer, Boundary, Polygon, SatelliteIngestionJobRequest, WeatherIngestionJobRequest
+from azure.farmbeats import FarmBeatsClient
 
 # %% [markdown]
 # ### Farmbeats Configuration

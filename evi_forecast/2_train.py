@@ -13,6 +13,7 @@
 # Standard library imports
 import os
 import pickle
+import sys
 from datetime import datetime
 
 # Third party imports
@@ -22,18 +23,12 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 
-
-# Local/library specific imports
+# Local  imports
 from utils.config import farmbeats_config
 from utils.constants import CONSTANTS
 from utils.ard_util import ard_preprocess
 from utils.satellite_util import SatelliteUtil
 from utils.weather_util import WeatherUtil
-
-# Disable unnecessary logs
-import sys
-import logging
-logging.disable(sys.maxsize)
 
 # %% [markdown]
 # ### Get Satellite and Weatther Data

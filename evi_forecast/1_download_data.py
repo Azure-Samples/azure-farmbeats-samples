@@ -22,28 +22,25 @@
 # Standard library imports
 import json
 import os
+from datetime import datetime
 
 # Third party imports
 import pandas as pd
 from azure.core.exceptions import HttpResponseError
 from azure.identity import ClientSecretCredential
-from datetime import datetime
 
-# Local/library specific imports
-from azure.farmbeats import FarmBeatsClient
-from azure.farmbeats.models import (Farmer, Boundary, Polygon,
-                                    SatelliteIngestionJobRequest,
-                                    WeatherIngestionJobRequest, 
-                                    SatelliteData)
+# Local imports
 from utils.config import farmbeats_config
 from utils.constants import CONSTANTS
 from utils.satellite_util import SatelliteUtil
 from utils.weather_util import WeatherUtil
 
-# Disable unnecessary logs
-import sys
-import logging
-logging.disable(sys.maxsize)
+# SDK imports
+from azure.farmbeats import FarmBeatsClient
+from azure.farmbeats.models import (Farmer, Boundary, Polygon,
+                                    SatelliteIngestionJobRequest,
+                                    WeatherIngestionJobRequest, 
+                                    SatelliteData)
 
 # %% [markdown]
 # ### Farmbeats Configuration
@@ -325,10 +322,10 @@ df.to_csv("satellite_paths.csv", index=None)
 # We query the weather data from Azure Farmbeats and the resposne is list of json object. This gets conveted into pandas dataframes (The typical data format for ML model inputs) and saved to your compute.
 
 # %%
-for boundary in boundaries:
+for boundary_obj in boundary_objs:
     weather_list = fb_client.weather.list(
-            farmer_id=boundary.farmer_id,
-            boundary_id=boundary.id,
+            farmer_id=boundary_obj.farmer_id,
+            boundary_id=boundary_obj.id,
             extension_id="dtn.clearAg",
             weather_data_type="historical",
             granularity="daily")
@@ -338,16 +335,16 @@ for boundary in boundaries:
         weather_data.append(w_data)
 
     w_df = WeatherUtil.get_weather_data_df(weather_data)
-    w_df.to_csv(boundary.id + "_historical.csv", index=False)
+    w_df.to_csv(os.path.join(root_dir, boundary.id + "_historical.csv"), index=False)
 
 # %% [markdown]
 # ### Download Weather Data (Forecast) to Local
 
 # %%
-for boundary in boundaries:
+for boundary_obj in boundary_objs:
     weather_list = fb_client.weather.list(
-            farmer_id=boundary.farmer_id,
-            boundary_id=boundary.id,
+            farmer_id=boundary_obj.farmer_id,
+            boundary_id=boundary_obj.id,
             extension_id="dtn.clearAg", 
             weather_data_type="forecast", 
             granularity="daily")
@@ -357,6 +354,6 @@ for boundary in boundaries:
         weather_data.append(w_data)
 
     w_df = WeatherUtil.get_weather_data_df(weather_data)
-    w_df.to_csv(boundary.id + "_forecast.csv", index=False)
+    w_df.to_csv(os.path.join(root_dir, boundary.id + "_forecast.csv"), index=False)
 
 
