@@ -1,17 +1,44 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
 # %% [markdown]
-# # Data Download using Azure FarmBeats
-# Download the required satellite and weather data using Azure FarmBeats PaaS.
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# 
+# Licensed under the MIT License.
 # %% [markdown]
-# ### Import 3rd party libraies
+# # Azure FarmBeats: Satellite and Weather Data
+# 
+# In this notebook, you learn the following things:
+# 
+# > * Create a farmer
+# > * Create boundaries
+# > * How to submit satellite and weather (historical and forecast) jobs for boundaries
+# > * Check the status of jobs
+# > * Download satellite data to local compute
+# > * Download weather data to local compute
+# %% [markdown]
+# ### Import libraies
 
 # %%
+# Standard library imports
 import json
+import os
+
+# Third party imports
 import pandas as pd
 from azure.core.exceptions import HttpResponseError
 from azure.identity import ClientSecretCredential
 from datetime import datetime
+
+# Local/library specific imports
+from azure.farmbeats import FarmBeatsClient
+from azure.farmbeats.models import (Farmer, Boundary, Polygon,
+                                    SatelliteIngestionJobRequest,
+                                    WeatherIngestionJobRequest, 
+                                    SatelliteData)
+from utils.config import farmbeats_config
+from utils.constants import CONSTANTS
+from utils.satellite_util import SatelliteUtil
+from utils.weather_util import WeatherUtil
 
 # Disable unnecessary logs
 import sys
@@ -19,25 +46,12 @@ import logging
 logging.disable(sys.maxsize)
 
 # %% [markdown]
-# ### Import Farmbeats and Utilities
-
-# %%
-from azure.farmbeats import FarmBeatsClient
-from azure.farmbeats.models import (Farmer, Boundary, Polygon,
-                                    SatelliteIngestionJobRequest,
-                                    WeatherIngestionJobRequest)
-
-from utils.config import farmbeats_config
-from utils.weather_util import WeatherUtil
-from utils.satellite_util import SatelliteUtil
-from utils.constants import CONSTANTS
-
-# %% [markdown]
 # ### Farmbeats Configuration
+# Please follow the instrucitons at "{TODO file link}" to create Azue Farmbeats resource and generate client id, client secrets, etc.. These values needs to be added in config.py accordingly
+# 
 
 # %%
 # FarmBeats Client definition
-# Please make sure to change default values in config.py
 credential = ClientSecretCredential(
     tenant_id=farmbeats_config['tenant_id'],
     client_id=farmbeats_config['client_id'],
@@ -56,21 +70,23 @@ fb_client = FarmBeatsClient(
 
 
 # %%
-RUN = 62  # This Variable helps in creating unique job id everytime you run
+RUN = 83  # This helps in creating unique job id everytime you run
 NO_BOUNDARIES = 2  # Defaults 50;
 root_dir = "/home/temp/"  # Satellite data gets downloaded here
 
 # %% [markdown]
 # ### Create Farmer
+# 
+# Create a Farmer entity in Farmbeats system. You need to provide a farmer id as input
 
 # %%
-farmer_id = "annam_farmer"
+farmer_id = "contoso_farmer"
 try:
     farmer = fb_client.farmers.get(farmer_id=farmer_id)
     if farmer is not None:
-        print("Farmer Exists")
+        print("Farmer {} Exists.".format(farmer_id))
     else:
-        print("Farmer doesn't exist...Creating one ", end="", flush=True)
+        print("Farmer doesn't exist...Creating ... ", end="", flush=True)
         farmer = fb_client.farmers.create_or_update(
             farmer_id=farmer_id,
             farmer=Farmer()
@@ -80,25 +96,31 @@ except Exception as e:
 
 # %% [markdown]
 # ### Create Boundaries
+# 
+# Reads bounary geojson objects from a csv file and create boundary entity in Farmbeats ssytem per each geojson object. 
+# 
+# <b>Inputs:</b> Boundary geojson string, boundar id
 
 # %%
-# Read 1000 farm geojsons from farms_1kmx1km.csv
-locations_df = pd.read_csv("data//farms_sample_1kmx1km.csv")
-locations_df["farms1"] = locations_df.farms.apply(json.loads)  # farm geojsons converted from string to list with numeric elements
+# farms_sample_1kmx1km.csv file contains farm boundaries curated from Crop Data Layer.
+# You can plug-in your own data file in the same format
+locations_df = pd.read_csv(os.path.join("data","farms_sample_1kmx1km.csv"))
+locations_df["farm_boundaries"] = locations_df.farms.apply(json.loads)  # converted from string to list with numeric elements
 
 
 # %%
-boundaries = []  # List of boundaries
+boundaries = locations_df.farm_boundaries.values[:NO_BOUNDARIES]
+boundary_objs = []  # List of boundaru objects
 
-for i, boundary_polygon in enumerate(locations_df.farm_boundaries.values[:NO_BOUNDARIES]):
-    boundary_id = "boundary" + str(i) + str(RUN)
+for i, boundary_polygon in enumerate(boundaries):
+    boundary_id = "boundary" + str(i)
     try:
         boundary = fb_client.boundaries.get(
             farmer_id=farmer_id,
             boundary_id=boundary_id
         )
         if boundary is not None:
-            print("Exist")
+            print(f"Boundary with id {boundary.id} Exist", end="\n")
         else:
             print(f"Creating boundary with id {boundary_id}... ", end="")
             boundary = fb_client.boundaries.create_or_update(
@@ -116,10 +138,14 @@ for i, boundary_polygon in enumerate(locations_df.farm_boundaries.values[:NO_BOU
             print("Created")
     except Exception as e:
         print(e)
-    boundaries.append(boundary)
+    boundary_objs.append(boundary)
+
+#TODO: If Boundary ID + Different geometry given, needs force delete existing and create new one with same ID 
 
 # %% [markdown]
 # ###  Submit Satellite Jobs
+# Create a satellite job for a given set of boundaries using Azure Farmbeats satellite_data_ingestion_job and SatelliteIngestionJobRequest() methods. 
+# This return a pollable object for each satellite job. We can query this object to know the status of each job untill gets completed.
 
 # %%
 # Start and End data for Satellite and Weather data to be pulled
@@ -129,7 +155,7 @@ end_dt = datetime.strptime(CONSTANTS["interp_date_end"], "%d-%m-%Y")
 
 # %%
 satellite_jobs = []
-for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
+for i, boundary_obj in enumerate(boundary_objs):
     job_id = "satellitejob"+ str(i) + str(RUN)
     
     # Submit Satellite Job
@@ -138,22 +164,33 @@ for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
         satellite_job = fb_client.scenes.begin_create_satellite_data_ingestion_job(
             job_id=job_id,
             job=SatelliteIngestionJobRequest(
-                farmer_id=boundary.farmer_id,
-                boundary_id=boundary.id,
+                farmer_id=boundary_obj.farmer_id,
+                boundary_id=boundary_obj.id,
                 start_date_time=start_dt,
                 end_date_time=end_dt,
+                data=SatelliteData(
+                    image_names=[
+                        # "B01",
+                        # "B02",
+                        # "B03",
+                        # "B04",
+                        "LAI", 
+                        "NDVI"
+                    ]
+                )
             ),
             polling=True
         )
         print("Submitted Satellite Job")
 
     except HttpResponseError as e:
-        print(e)
+        print(e.response.body())
         raise
     satellite_jobs.append(satellite_job)
 
 # %% [markdown]
 # ### Check status of Satellite Jobs
+# Now, wait for the satellie jobs to be completed. We can check the status of each job which results in <i> succeeded </i> or <i> failed </i> or <i> waiting </i>. Needs further investigation for failed jobs. 
 
 # %%
 for sat_job in satellite_jobs:
@@ -167,18 +204,22 @@ for sat_job in satellite_jobs:
 
 # %% [markdown]
 # ### Submit Weather (Historical) Jobs
+# 
+# Similar to satellite job, submit weather job for each boundary using azure farmbeats weather.begin_create_data_ingestion_job() and WeatherIngestionJobRequest() methods. This returns the weather job objects for each boundary. 
+# 
+# This also require the details of weather data provider that you want to use. The details are specific to weather, but typically includes extension id, APP_KEY, APP_ID, etc.
 
 # %%
 # Weather API inputs
-extension_id = "dtn.clearAg"
-extension_api_name = "dailyhistorical"
+extension_id = farmbeats_config["weather_provider_extension_id"]
 extension_data_provider_api_key = farmbeats_config["weather_provider_key"]
 extension_data_provider_app_id = farmbeats_config["weather_provider_id"]
+extension_api_name = "dailyhistorical"
 
 
 # %%
 weather_jobs = []
-for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
+for i, boundary_obj in enumerate(boundary_objs):
     job_id = "weatherjob" + str(i) + str(RUN)
     st_unix = int(start_dt.timestamp())
     ed_unix = int(end_dt.timestamp())
@@ -187,8 +228,8 @@ for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
         weather_job = fb_client.weather.begin_create_data_ingestion_job(
             job_id=job_id,
             job=WeatherIngestionJobRequest(
-                farmer_id=boundary.farmer_id,
-                boundary_id=boundary.id,
+                farmer_id=boundary_obj.farmer_id,
+                boundary_id=boundary_obj.id,
                 extension_id=extension_id, 
                 extension_api_name=extension_api_name, 
                 extension_api_input={"start": st_unix, "end": ed_unix},
@@ -199,12 +240,13 @@ for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
         )
         print("Submitted Weather Job")
     except HttpResponseError as e:
-        print(e)
+        print(e.response.body())
         raise
     weather_jobs.append(weather_job)
 
 # %% [markdown]
 # ### Check status of Weather (Historical) Jobs
+# Wait for weather jobs to get completed. Log the weather job ids which have failed and can be investigated further. The failed jobs can be submitted again the same weather.begin_create_data_ingestion_job() method. 
 
 # %%
 for wth_job in weather_jobs:
@@ -219,13 +261,14 @@ for wth_job in weather_jobs:
 
 # %% [markdown]
 # ### Submit Weather (forecast) jobs
+# Similar to historical weather data, we need weather forecast data. Submit the jobs for each boundary using weather.begin_create_data_ingestion_job and provide extension_api_name as according to weather provider  (E.g., DTN ClearAg, the extension api name for forecast data is 'dailyforecast')
 
 # %%
 weather_forecast_jobs = []
 START = 0
 END = 10
 extension_api_name = "dailyforecast"
-for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
+for i, boundary_obj in enumerate(boundary_obj):
     job_id = "weatherforecastjob"+ str(i) + str(RUN)
     
     try:
@@ -233,8 +276,8 @@ for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
         weather_job = fb_client.weather.begin_create_data_ingestion_job(
             job_id=job_id,
             job=WeatherIngestionJobRequest(
-                farmer_id=boundary.farmer_id,
-                boundary_id=boundary.id,
+                farmer_id=boundary_obj.farmer_id,
+                boundary_id=boundary_obj.id,
                 extension_id=extension_id,
                 extension_api_name=extension_api_name,
                 extension_api_input={"start": START, "end": END},
@@ -245,7 +288,7 @@ for i, boundary in enumerate(boundaries[:NO_BOUNDARIES]):
         )
         print("Submitted Weather Job")
     except HttpResponseError as e:
-        print(e)
+        print(e.response.body())
         raise
     weather_forecast_jobs.append(weather_job)
 
@@ -265,6 +308,9 @@ for wth_job in weather_forecast_jobs:
 
 # %% [markdown]
 # ### Download Satellite Data to Local
+# 
+# Once the data has been ingested to Azure Farmbeats, it can be downloaded to you local compute or AML compute or Data Science VM.
+# The data gets downloaded using scenes download method. This would dependent on network bandwidth of your compute.
 
 # %%
 df = SatelliteUtil(farmbeats_client=fb_client).download_and_get_sat_file_paths(farmer_id, boundaries,
@@ -274,7 +320,9 @@ df = SatelliteUtil(farmbeats_client=fb_client).download_and_get_sat_file_paths(f
 df.to_csv("satellite_paths.csv", index=None)
 
 # %% [markdown]
-# ### Download Weather Data to Local
+# ### Download Weather Data (Historical) to Local
+# 
+# We query the weather data from Azure Farmbeats and the resposne is list of json object. This gets conveted into pandas dataframes (The typical data format for ML model inputs) and saved to your compute.
 
 # %%
 for boundary in boundaries:
@@ -292,6 +340,8 @@ for boundary in boundaries:
     w_df = WeatherUtil.get_weather_data_df(weather_data)
     w_df.to_csv(boundary.id + "_historical.csv", index=False)
 
+# %% [markdown]
+# ### Download Weather Data (Forecast) to Local
 
 # %%
 for boundary in boundaries:
@@ -308,3 +358,5 @@ for boundary in boundaries:
 
     w_df = WeatherUtil.get_weather_data_df(weather_data)
     w_df.to_csv(boundary.id + "_forecast.csv", index=False)
+
+

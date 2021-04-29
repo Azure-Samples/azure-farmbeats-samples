@@ -7,23 +7,23 @@ from IPython import get_ipython
 # # Test EVI Forecast (local)
 
 # %%
-# System Imports
+# Stanadard library imports
 import json
 import pickle
 import os
 import requests
 from datetime import datetime,timedelta
 
-#3rd Party Imports
+# Third party library imports
 import numpy as np
 import pandas as pd
 import rasterio
 import tensorflow as tf
-from azure.identity import ClientSecretCredential
 from tensorflow import keras
 
 
-# Local Imports
+# Local / libray specific Imports
+from azure.identity import ClientSecretCredential
 from azure.farmbeats.models import Farmer, Boundary, Polygon, SatelliteIngestionJobRequest, WeatherIngestionJobRequest
 from azure.farmbeats import FarmBeatsClient
 from utils.config import farmbeats_config
@@ -61,10 +61,11 @@ fb_client = FarmBeatsClient(
 # %% [markdown]
 # ### Forecast EVI for test Boundary
 # %% [markdown]
-# #### Satellite Data
+# #### Satellie Data
 
 # %%
-farmer_id = "annam_farmer"
+root_dir = "/home/temp/"
+farmer_id = "contoso_farmer"
 boundary_id = "boundary055"
 
 end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
@@ -76,11 +77,9 @@ boundary = fb_client.boundaries.get(
             boundary_id=boundary_id
         )
 
-root_dir = "/home/temp/"
-
 
 # %%
-satellite_links = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
+sat_links1 = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
 
 # get last available data of satellite data
 end_dt_w = datetime.strptime(
@@ -127,16 +126,16 @@ w_df_forecast = WeatherUtil.get_weather_data_df(weather_data)
 
 # %%
 # merge weather data
-w_df = pd.concat([w_df_hist, w_df_forecast], axis=0)
+weather_df = pd.concat([w_df_hist, w_df_forecast], axis=0)
 
 with open(CONSTANTS["w_pkl"], "rb") as f:
-    w_parms, w_mn, w_sd = pickle.load(f)
+    w_parms, weather_mean, weather_std = pickle.load(f)
 
 
 # %%
 ard = ard_preprocess(
         sat_links1=sat_links1,
-        w_df=w_df,
+        w_df=weather_df,
         sat_res_x=1,
         var_name=CONSTANTS["var_name"],
         interp_date_start=end_dt_w - timedelta(days=60),
@@ -197,13 +196,13 @@ label_names = [
 ]
 
 
-label_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
+pred_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
     lat=ard.lat_.values, long=ard.long_.values
 )
 
 
 # %%
-tmp_df
+pred_df.head()
 
 # %% [markdown]
 # ### Write output to TIF files
@@ -214,14 +213,14 @@ import time
 from IPython import display
 from rasterio.plot import show
 
-output_dir = "results//"
+output_dir = CONSTANTS["results_folder"]
 ref_tif = sat_links1.filePath.values[0]
 with rasterio.open(ref_tif) as src:
     ras_meta = src.profile
 
 
 # %%
-for coln in tmp_df.columns[:-2]:
+for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
     data_array = np.array(tmp_df[coln]).reshape(src.shape)
     with rasterio.open(os.path.join(output_dir, coln + '.tif'), 'w', **ras_meta) as dst:
         dst.write(data_array, indexes=1)
@@ -230,9 +229,11 @@ for coln in tmp_df.columns[:-2]:
 # ### Visualize EVI Forecast Maps
 
 # %%
-for coln in tmp_df.columns[:-2]:
+for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
     src = rasterio.open(os.path.join(output_dir, coln + '.tif'))
     show(src.read(), transform=src.transform, title=coln)
     #show_hist(src)
     display.clear_output(wait=True)
     time.sleep(1)  
+
+

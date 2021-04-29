@@ -4,7 +4,6 @@ that includes options for AKS compute, input days and output days specs, filenam
 """
 
 CONSTANTS= {
-    "weather_data_fldr": "results//",  # weather csv's to be saved here with name field_id.csv
     "sat_job_ids": "results//job_ids_11feb2021.csv",  # satellite job ids along with polygon will be saved in csv. Output for _1_download_fb
     "sat_file_paths": "satellite_paths.csv",  # filePaths of tif files. Output for _1_download_fb and imput for _2_build_model
     "weather_data_fldr": "C:\\azure-farmbeats-samples\\evi_forecast\\",
@@ -18,6 +17,7 @@ CONSTANTS= {
     "interp_date_end": "26-04-2021",  # model iterpolation start date
     
     # model results filenames
+    "results_folder": "results//",  # weather csv's to be saved here with name field_id.csv
     "ardpkl": "results//ARD_18mar2021.pkl",  # Analysis ready dataset pickle file
     "w_pkl": "results//weather_parms_18mar2021.pkl",  # training data weather parameters list and sttaistics
     "modelh5": "results//model_100_100_100_18mar2021.h5",  # trained model in h5 format

@@ -1,75 +1,93 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
 # %% [markdown]
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# 
+# Licensed under the MIT License.
+# %% [markdown]
 # # Train EVI Forecast
 # %% [markdown]
-# ### Import Packages
+# ### Import libraries
 
 # %%
-# System Imports
-from datetime import datetime
-import numpy as np
+# Standard library imports
 import os
-import pandas as pd
 import pickle
+from datetime import datetime
 
-# Local Imports
-from utils.config import farmbeats_config
-from utils.weather_util import WeatherUtil
-from utils.satellite_util import SatelliteUtil
-from utils.constants import CONSTANTS
-from utils.ard_util import ard_preprocess
-
-#3rd party Imports
+# Third party imports
 import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
-configuration = tf.compat.v1.ConfigProto()
-configuration.gpu_options.allow_growth = True
-session = tf.compat.v1.Session(config=configuration)
-tf.test.gpu_device_name()
+
+
+# Local/library specific imports
+from utils.config import farmbeats_config
+from utils.constants import CONSTANTS
+from utils.ard_util import ard_preprocess
+from utils.satellite_util import SatelliteUtil
+from utils.weather_util import WeatherUtil
+
+# Disable unnecessary logs
+import sys
+import logging
+logging.disable(sys.maxsize)
 
 # %% [markdown]
 # ### Get Satellite and Weatther Data
+
+# %%
+root_dir = '/home/temp/'
+
+# %% [markdown]
+# #### Load satellite data  local paths
 
 # %%
 sat_links = pd.read_csv(CONSTANTS["sat_file_paths"])
 sat_links["fileExist"] = sat_links.filePath.apply(os.path.exists)
 sat_links.head()
 
-# TODO: Check fileExist is True for all rows 
+# TODO: Check fileExist is True for all rows and raise error  
 
+# %% [markdown]
+# #### List of weather parameter used in model training
 
 # %%
-w_parms = [
-    "airTempMin-F",
-    "dewPointMin-F",
-    "windSpeed-mph",
-    "precipitation-in",
-    "relativeHumidity-%",
-    "temperature-F",
-    "windSpeed2mAvg-mph",
-    "snowAccPeriod-in",
-    "liquidAccPeriod-in",
-    "windSpeed2mMin-mph",
-    "sunshineDuration-hours",
-    "relativeHumidityMax-%",
-    "relativeHumidityMin-%",
-    "shortWaveRadiationAvg-W/m^2",
-    "dewPointMax-F",
-    "petPeriod-in",
-    "windSpeedMin-mph",
-    "iceAccPeriod-in",
-    "airTempMax-F",
-    "windSpeed2mMax-mph",
-    "dewPoint-F",
-    "cloudCover-%",
-    "longWaveRadiationAvg-W/m^2",
-    "windSpeedMax-mph",
+weather_parms = [
+    'airTempMax-F', 
+    'airTempMin-F', 
+    'cloudCover-%', 
+    'dewPoint-F', 
+    'dewPointMax-F', 
+    'dewPointMin-F', 
+    'iceAccPeriod-in', 
+    'liquidAccPeriod-in', 
+    'longWaveRadiationAvg-W/m^2', 
+    'petPeriod-in', 
+    'precipitation-in', 
+    'relativeHumidity-%', 
+    'relativeHumidityMax-%', 
+    'relativeHumidityMin-%', 
+    'shortWaveRadiationAvg-W/m^2', 
+    'snowAccPeriod-in', 
+    'sunshineDuration-hours', 
+    'temperature-F', 
+    'windSpeed-mph', 
+    'windSpeed2mAvg-mph', 
+    'windSpeed2mMax-mph', 
+    'windSpeed2mMin-mph', 
+    'windSpeedMax-mph', 
+    'windSpeedMin-mph
 ]
 
+# %% [markdown]
+# ### Prepare Train and Validation sets
 
 # %%
+# Combine satellite file paths and weather file per boundary
+
 trainval = (
     sat_links.drop_duplicates(["boundaryId", "fileExist"])
     .groupby(["boundaryId"])["fileExist"]
@@ -80,35 +98,45 @@ trainval = (
 )
 
 
-trainval["weather_data_exists"] = (CONSTANTS["weather_data_fldr"] + trainval["boundaryId"] + "_historical.csv").apply(
+# Check for weather file exists or not
+trainval["w_exists"] = (os.path.join(root_dir, trainval["boundaryId"] + "_historical.csv")).apply(
     os.path.exists
 )
 
 trainval = trainval.query("w_exists")
+
+
+# %%
+# Split data into train and validation sets in 80% and 20% respectively
 np.random.seed(10)
 trainval["trainval"] = np.where(
     np.random.uniform(0, 1, trainval.shape[0]) < 0.8, "Train", "Val"
 )
 
-
-# %%
 # TODO: Tobe removed once no_boundaries are more than 1
 trainval = pd.concat([trainval]*2, ignore_index=True)
 trainval.loc[1,'trainval'] = 'Val'
 trainval
 
+# %% [markdown]
+# ### Get weather statistics for Normalization
 
 # %%
 # get mean and standard deviation of training data weather parameters for normalization
 w_stats = pd.concat(
     [
-        pd.read_csv(CONSTANTS["weather_data_fldr"] + x + "_historical.csv")
+        pd.read_csv(os.path.join(root_dir, trainval["boundaryId"] + "_historical.csv"))
         for x in trainval.query('trainval == "Train"').boundaryId.values
     ],
     axis=0,
-)[w_parms].agg({"mean", "std"})
-w_mn = w_stats.filter(like="mean", axis=0)[w_parms].values
-w_sd = w_stats.filter(like="std", axis=0)[w_parms].values
+)[weather_parms].agg({"mean", "std"})
+weather_mean = w_stats.filter(like="mean", axis=0)[w_parms].values
+weather_std = w_stats.filter(like="std", axis=0)[w_parms].values
+
+# Save weather parameters normalization stats
+os.makedirs(os.path.dirname(CONSTANTS["w_pkl"]), exist_ok=True)
+with open(CONSTANTS["w_pkl"], "wb+") as f:
+    pickle.dump([weather_parms, weather_mean, weather_std], f)
 
 
 # %%
@@ -116,15 +144,15 @@ def get_ARD(boundaryId):
     # function for preparing Analysis Ready Dataset
     # intended for use in _2_build_model.py
     
-    sat_links1 = sat_links.query(
+    boundary_id_sat_links = sat_links.query(
         'boundaryId == @boundaryId'
     )
      
     # in reading w_df, if error occurs with farm_code, change it to field_id
-    w_df = pd.read_csv(CONSTANTS["weather_data_fldr"] + boundaryId + "_historical.csv")
+    w_df = pd.read_csv(os.path.join(root_dir, trainval["boundaryId"] + "_historical.csv"))
     
     da_pc = ard_preprocess(
-        sat_links1=sat_links1,
+        sat_links1=boundary_id_sat_links,
         w_df=w_df,
         sat_res_x=CONSTANTS["sat_res_x_model"],
         var_name=CONSTANTS["var_name"],
@@ -156,12 +184,12 @@ ards_fetch[0].result()
 
 
 # %%
-da_fin = pd.concat(
+data = pd.concat(
     [
         ards_fetch[x]
         .result()
         .assign(
-            farm_code=trainval.boundaryId.values[x], trainval=trainval.trainval.values[x]
+            boundary_code=trainval.boundaryId.values[x], trainval=trainval.trainval.values[x]
         )
         for x in range(len(trainval.boundaryId.values))
         if ards_fetch[x].exception() == None
@@ -173,33 +201,30 @@ da_fin = pd.concat(
 # ### Model Data Preparation
 
 # %%
-da_train = da_fin.query('trainval == "Train"')
-da_val = da_fin.query('trainval == "Val"')
+data_train = data.query('trainval == "Train"')
+data_val = data.query('trainval == "Val"')
 
 # Prepare train and validation tensors
 # converting list variables in ARD DataFrame to numpy array (tensors)
 X_train = [
-    np.array(da_train.input_evi.to_list()),
-    np.array(da_train.input_weather.to_list()),
-    np.array(da_train.forecast_weather.to_list()),
+    np.array(data_train.input_evi.to_list()),
+    np.array(data_train.input_weather.to_list()),
+    np.array(data_train.forecast_weather.to_list()),
 ]
-Y_train = np.array(da_train.output_evi.to_list())
+Y_train = np.array(data_train.output_evi.to_list())
+
+
 X_val = [
-    np.array(da_val.input_evi.to_list()),
-    np.array(da_val.input_weather.to_list()),
-    np.array(da_val.forecast_weather.to_list()),
+    np.array(data_val.input_evi.to_list()),
+    np.array(data_val.input_weather.to_list()),
+    np.array(data_val.forecast_weather.to_list()),
 ]
-Y_val = np.array(da_val.output_evi.to_list())
+Y_val = np.array(data_val.output_evi.to_list())
 
 # Save Analysis Ready Dataset (ARD)
 os.makedirs(os.path.dirname(CONSTANTS["ardpkl"]), exist_ok=True)
 with open(CONSTANTS["ardpkl"], "wb") as f:
     pickle.dump(da_fin, f)
-
-# Save weather parameters normalization stats
-os.makedirs(os.path.dirname(CONSTANTS["w_pkl"]), exist_ok=True)
-with open(CONSTANTS["w_pkl"], "wb+") as f:
-    pickle.dump([w_parms, w_mn, w_sd], f)
 
 # %% [markdown]
 # ### Model Architecture
@@ -255,7 +280,7 @@ model = get_model(len(w_parms), 100, 100, 100)
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.1, momentum=0.9)
 model.compile(loss="mse", optimizer=optimizer, metrics=["mse"])
 # Model run
-history1 = model.fit(
+training_history = model.fit(
     X_train,
     Y_train,
     epochs=20,
@@ -287,7 +312,8 @@ df_err_mn = pd.DataFrame(
 df_err_mn.plot()
 plt.suptitle(
     "RMSE plot comparing Day i to Day 0 vs Day i to ANN model prediction\n Validation RMSE: "
-    + str(np.round(np.sqrt(history1.history["val_mse"][-1]), 4))
+    + str(np.round(np.sqrt(training_history.history["val_mse"][-1]), 4))
 )
 plt.savefig(CONSTANTS["model_result_png"])
+
 
