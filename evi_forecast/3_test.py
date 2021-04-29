@@ -4,6 +4,10 @@
 from IPython import get_ipython
 
 # %% [markdown]
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# 
+# Licensed under the MIT License.
+# %% [markdown]
 # # Test EVI Forecast (local)
 
 # %%
@@ -19,7 +23,6 @@ import numpy as np
 import pandas as pd
 import rasterio
 import tensorflow as tf
-from azure.identity import ClientSecretCredential
 from tensorflow import keras
 
 # Local imports
@@ -28,6 +31,9 @@ from utils.weather_util import WeatherUtil
 from utils.satellite_util import SatelliteUtil
 from utils.constants import CONSTANTS
 from utils.ard_util import ard_preprocess
+
+# Azure imports
+from azure.identity import ClientSecretCredential
 
 # SDK imports
 from azure.farmbeats.models import Farmer, Boundary, Polygon, SatelliteIngestionJobRequest, WeatherIngestionJobRequest

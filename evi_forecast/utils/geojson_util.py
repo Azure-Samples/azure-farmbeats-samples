@@ -1,7 +1,7 @@
-"""
-The module has geojson helper methods.
-"""
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license.
 
+# Third party imports
 import geojson
 from shapely.geometry import Polygon, MultiPolygon
 from shapely.geometry.base import BaseGeometry

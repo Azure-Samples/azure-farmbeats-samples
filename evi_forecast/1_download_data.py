@@ -22,18 +22,28 @@
 # Standard library imports
 import json
 import os
+import sys
 from datetime import datetime
+
+# Disable unnecessary logs 
+import logging
+logging.disable(sys.maxsize)
+import warnings
+warnings.filterwarnings("ignore")
 
 # Third party imports
 import pandas as pd
-from azure.core.exceptions import HttpResponseError
-from azure.identity import ClientSecretCredential
 
 # Local imports
 from utils.config import farmbeats_config
 from utils.constants import CONSTANTS
+from utils.io_utils import IOUtil
 from utils.satellite_util import SatelliteUtil
 from utils.weather_util import WeatherUtil
+
+# Azure imports
+from azure.core.exceptions import HttpResponseError
+from azure.identity import ClientSecretCredential
 
 # SDK imports
 from azure.farmbeats import FarmBeatsClient
@@ -44,7 +54,7 @@ from azure.farmbeats.models import (Farmer, Boundary, Polygon,
 
 # %% [markdown]
 # ### Farmbeats Configuration
-# Please follow the instrucitons at "{TODO file link}" to create Azue Farmbeats resource and generate client id, client secrets, etc.. These values needs to be added in config.py accordingly
+# Please follow the instrucitons at "{TODO: Add file link}" to create Azue Farmbeats resource and generate client id, client secrets, etc.. These values needs to be added in config.py accordingly
 # 
 
 # %%
@@ -67,9 +77,9 @@ fb_client = FarmBeatsClient(
 
 
 # %%
-RUN = 83  # This helps in creating unique job id everytime you run
+RUN = 87  # This helps in creating unique job id everytime you run
 NO_BOUNDARIES = 2  # Defaults 50;
-root_dir = "/home/temp/"  # Satellite data gets downloaded here
+root_dir = "/tmp"  # Satellite data gets downloaded here
 
 # %% [markdown]
 # ### Create Farmer
@@ -171,7 +181,6 @@ for i, boundary_obj in enumerate(boundary_objs):
                         # "B02",
                         # "B03",
                         # "B04",
-                        "LAI", 
                         "NDVI"
                     ]
                 )
@@ -265,7 +274,7 @@ weather_forecast_jobs = []
 START = 0
 END = 10
 extension_api_name = "dailyforecast"
-for i, boundary_obj in enumerate(boundary_obj):
+for i, boundary_obj in enumerate(boundary_objs):
     job_id = "weatherforecastjob"+ str(i) + str(RUN)
     
     try:
@@ -310,11 +319,13 @@ for wth_job in weather_forecast_jobs:
 # The data gets downloaded using scenes download method. This would dependent on network bandwidth of your compute.
 
 # %%
-df = SatelliteUtil(farmbeats_client=fb_client).download_and_get_sat_file_paths(farmer_id, boundaries,
+df = SatelliteUtil(farmbeats_client=fb_client).download_and_get_sat_file_paths(farmer_id, boundary_objs,
                                                                             start_dt,
                                                                             end_dt,
                                                                             root_dir)
-df.to_csv("satellite_paths.csv", index=None)
+# Write output to result directory
+IOUtil.create_dir_safely(CONSTANTS["results_dir"])
+df.to_csv(os.path.join(CONSTANTS["results_dir"], "satellite_paths.csv"), index=None)
 
 # %% [markdown]
 # ### Download Weather Data (Historical) to Local

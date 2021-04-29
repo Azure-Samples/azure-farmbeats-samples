@@ -1,3 +1,6 @@
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license.
+
 # Standard library imports
 import os
 from itertools import tee
@@ -31,13 +34,13 @@ class SatelliteUtil:
                 tif_file.write(bits)
         return out_path
 
-    def download_scenes(self,
-                        boundary, start_date_time, end_date_time, root_dir):   
+    def download_scenes(self, boundary, start_date_time, end_date_time, band_names, root_dir):   
         scenes = self.farmbeats_client.scenes.list(
             boundary.farmer_id,
             boundary.id,
             start_date_time=start_date_time,
             end_date_time=end_date_time,
+            image_names=band_names
         )
         scenes, scenes_2 = tee(scenes)
 
@@ -53,7 +56,7 @@ class SatelliteUtil:
         start_date_time,
         end_date_time,
         root_dir,
-        band_name="NDVI"
+        band_names=["NDVI"]
     ):
 
         """
@@ -63,7 +66,7 @@ class SatelliteUtil:
         print("Downloading Images to Local ...")
         all_scenes = []
         for boundary in boundaries:
-            scenes = self.download_scenes(boundary, start_date_time, end_date_time, root_dir)
+            scenes = self.download_scenes(boundary, start_date_time, end_date_time, band_names, root_dir)
             all_scenes.append(scenes)
         """
         if np.sum([len(x) for x in all_scenes]) == 0:
@@ -85,7 +88,7 @@ class SatelliteUtil:
         # For EVI and other bands, cloud mask, darkpixel mask and other resolutions, similar filtering can be performed
         df_allscenes_band = df_allscenes.query(
             'name == "'
-            + band_name
+            + band_names[0]
             + '" and resolution == 10 and cloudCoverPercentage == 0 and darkPixelPercentage < .1'
         )
 

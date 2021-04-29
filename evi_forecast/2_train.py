@@ -34,13 +34,13 @@ from utils.weather_util import WeatherUtil
 # ### Get Satellite and Weatther Data
 
 # %%
-root_dir = '/home/temp/'
+root_dir = '/tmp/'
 
 # %% [markdown]
 # #### Load satellite data  local paths
 
 # %%
-sat_links = pd.read_csv(CONSTANTS["sat_file_paths"])
+sat_links = pd.read_csv(os.path.join(CONSTANTS["results_folder"], "satellite_paths.csv"))
 sat_links["fileExist"] = sat_links.filePath.apply(os.path.exists)
 sat_links.head()
 

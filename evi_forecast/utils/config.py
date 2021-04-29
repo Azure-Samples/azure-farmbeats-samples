@@ -1,8 +1,6 @@
-"""
-Copyright (c) Microsoft Corporation. All rights reserved.
-FarmBeats config file
-"""
-
+# Copyright (c) Microsoft. All rights reserved.
+# Licensed under the MIT license.
+# TODO: Add a link to instructions on how to get client id, client secret, etc.
 farmbeats_config = {
     "client_id": "",
     "client_secret": "",
