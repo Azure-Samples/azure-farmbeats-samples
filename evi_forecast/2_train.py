@@ -34,7 +34,7 @@ from utils.weather_util import WeatherUtil
 # ### Get Satellite and Weatther Data
 
 # %%
-root_dir = '/tmp/'
+root_dir = CONSTANTS['root_dir']
 
 # %% [markdown]
 # #### Load satellite data  local paths
@@ -147,7 +147,7 @@ def get_ARD(boundaryId):
     w_df = pd.read_csv(os.path.join(root_dir, trainval["boundaryId"] + "_historical.csv"))
     
     da_pc = ard_preprocess(
-        sat_links1=boundary_id_sat_links,
+        sat_file_links=boundary_id_sat_links,
         w_df=w_df,
         sat_res_x=CONSTANTS["sat_res_x_model"],
         var_name=CONSTANTS["var_name"],

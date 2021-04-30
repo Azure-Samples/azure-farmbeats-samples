@@ -77,9 +77,9 @@ fb_client = FarmBeatsClient(
 
 
 # %%
-RUN = 87  # This helps in creating unique job id everytime you run
+RUN = 88  # This helps in creating unique job id everytime you run
 NO_BOUNDARIES = 2  # Defaults 50;
-root_dir = "/tmp"  # Satellite data gets downloaded here
+root_dir = CONSTANTS['root_dir']  # Satellite data gets downloaded here
 
 # %% [markdown]
 # ### Create Farmer
@@ -337,7 +337,7 @@ for boundary_obj in boundary_objs:
     weather_list = fb_client.weather.list(
             farmer_id=boundary_obj.farmer_id,
             boundary_id=boundary_obj.id,
-            extension_id="dtn.clearAg",
+            extension_id=extension_id,
             weather_data_type="historical",
             granularity="daily")
 
@@ -356,7 +356,7 @@ for boundary_obj in boundary_objs:
     weather_list = fb_client.weather.list(
             farmer_id=boundary_obj.farmer_id,
             boundary_id=boundary_obj.id,
-            extension_id="dtn.clearAg", 
+            extension_id=extension_id, 
             weather_data_type="forecast", 
             granularity="daily")
 

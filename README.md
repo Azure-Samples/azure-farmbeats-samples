@@ -33,14 +33,16 @@ EVI-Forecast:
 3. Get Credentials (APP_ID, APP_KEY) of Weather Provider
 
 
-### Installation
+### Run Samples on Azure Machine Learning Service
 1. First create [AML Compute](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-attach-compute-studio) 
 
-### Quickstart
+### Steps
 1. Launch the terminal of AML compute
 2. git clone https://github.com/Azure-Samples/azure-farmbeats-samples
-3. Go "Notebooks" pane and go to your username and click folder "azure-farmbeats-samples"
+3. Go "Notebooks" pane and go to your username and click folder "azure-farmbeats-samples"  
 4. Go to evi_forecast/1_download_data.ipynb
+5. Go to compute and click on 'jupyter' and it will take you to broswer
+6. Go to evi_forecast/1_download_data.ipynb
 
 ## Contributing
 This project doesn't accept contributions and suggestions at this moment!

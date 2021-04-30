@@ -7,13 +7,16 @@ that includes options for AKS compute, input days and output days specs, filenam
 """
 
 CONSTANTS= {
+    # data directories
+    "root_dir": "/tmp/farmbeats",  # Store the satellite and weather data
+
     # model specs
     "input_days": 30,  # input number of days for NDVI/EVI and weather
     "output_days": 10,  # number of days of weather forecast
-    "ref_tm_model": "01-05-2020",  # start of growing season
+    "ref_tm_model": "10-05-2020",  # start of growing season
     "sat_res_x_model": 10,  # spatial sampling in model training, this might differ for inferance
-    "interp_date_start": "26-04-2020",  # model iterpolation start date
-    "interp_date_end": "26-04-2021",  # model iterpolation start date
+    "interp_date_start": "01-05-2020",  # model iterpolation start date
+    "interp_date_end": "30-04-2021",  # model iterpolation start date
     
     # model results filenames
     "results_dir": "results/",

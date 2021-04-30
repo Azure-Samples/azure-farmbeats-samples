@@ -37,7 +37,7 @@ def ard_preprocess(
         rasterio.open(x).read(1) for x in sat_file_links.filePath.values
     ]
     getgeo1 = rasterio.open(
-        sat_links1.filePath.values[0]
+        sat_file_links.filePath.values[0]
     ).transform  # coordinates of farm    
     
     sat_data = np.array(sat_file_links.sat_data.values.tolist())
@@ -59,7 +59,7 @@ def ard_preprocess(
         xr.DataArray(
             sat_data1,
             [
-                ("time", pd.to_datetime(sat_links1.sceneDateTime).dt.date),
+                ("time", pd.to_datetime(sat_file_links.sceneDateTime).dt.date),
                 (
                     "lat",
                     getgeo1[2] + getgeo1[0] * sat_res_x * np.arange(sat_data1.shape[1]),
@@ -100,9 +100,10 @@ def ard_preprocess(
         .rename_axis(["time", "lat", "long"])
         .reset_index()
     )
-    data_comb_df["time"] = pd.to_datetime(da1.time).dt.date
+    data_comb_df["time"] = pd.to_datetime(data_comb_df.time).dt.date
     data_comb_df = data_comb_df.merge(w_df, on=["time"], how="inner").sort_values(["lat", "long", "time"])
-
+    
+    da1 = data_comb_df
     # TODO: Change variable names
     # remove unused data frames
     da = None
@@ -117,6 +118,7 @@ def ard_preprocess(
     da1["label"] = np.where(da1.d_remainder.values < input_days, "input", "output")
     # combining NDVI and weather variables to a list variable
     da1["lst1"] = da1[[var_name] + w_parms].values.tolist()
+    
     # remove data before growing season
     da2 = (
         da1.query("grp1 >= 0")

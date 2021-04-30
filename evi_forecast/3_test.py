@@ -15,8 +15,15 @@ from IPython import get_ipython
 import json
 import pickle
 import os
+import sys
 import requests
 from datetime import datetime,timedelta
+
+# Disable unnecessary logs 
+import logging
+logging.disable(sys.maxsize)
+import warnings
+warnings.filterwarnings("ignore")
 
 # Third party library imports
 import numpy as np
@@ -66,9 +73,9 @@ fb_client = FarmBeatsClient(
 # #### Satellie Data
 
 # %%
-root_dir = "/home/temp/"
-farmer_id = "contoso_farmer"
-boundary_id = "boundary055"
+root_dir = CONSTANTS['root_dir']
+farmer_id = "contoso_farmer" 
+boundary_id = "boundary1" 
 
 end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
 start_dt = end_dt - timedelta(days=60)
@@ -81,14 +88,14 @@ boundary = fb_client.boundaries.get(
 
 
 # %%
-sat_links1 = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
+sat_links = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
 
 # get last available data of satellite data
 end_dt_w = datetime.strptime(
-    sat_links1.sceneDateTime.sort_values(ascending=False).values[0][:10], "%Y-%m-%d"
+    sat_links.sceneDateTime.sort_values(ascending=False).values[0][:10], "%Y-%m-%d"
 )
 # calculate 30 days from last satellite available date
-start_dt_w = end_dt_w - timedelta(days=CONSTANTS["input_days"] + 1)
+start_dt_w = end_dt_w - timedelta(days=CONSTANTS["input_days"] - 1)
 
 # %% [markdown]
 # #### Weather Data
@@ -100,7 +107,7 @@ weather_list = fb_client.weather.list(
             boundary_id= boundary.id,
             start_date_time=start_dt_w,
             end_date_time=end_dt,
-            extension_id="dtn.clearAg", 
+            extension_id=farmbeats_config['weather_provider_extension_id'],
             weather_data_type= "historical", 
             granularity="daily")
 weather_data = []
@@ -116,7 +123,7 @@ weather_list = fb_client.weather.list(
             boundary_id= boundary.id,
             start_date_time=end_dt,
             end_date_time=end_dt + timedelta(10),
-            extension_id="dtn.clearAg", 
+            extension_id=farmbeats_config['weather_provider_extension_id'], 
             weather_data_type= "forecast", 
             granularity="daily")
 
@@ -133,10 +140,12 @@ weather_df = pd.concat([w_df_hist, w_df_forecast], axis=0)
 with open(CONSTANTS["w_pkl"], "rb") as f:
     w_parms, weather_mean, weather_std = pickle.load(f)
 
+# %% [markdown]
+# ### Prepare ARD for test boundary
 
 # %%
 ard = ard_preprocess(
-        sat_links1=sat_links1,
+        sat_file_links=sat_links,
         w_df=weather_df,
         sat_res_x=1,
         var_name=CONSTANTS["var_name"],
@@ -146,8 +155,8 @@ ard = ard_preprocess(
         input_days=CONSTANTS["input_days"],
         output_days=CONSTANTS["output_days"],
         ref_tm=start_dt_w.strftime("%d-%m-%Y"),
-        w_mn=w_mn,
-        w_sd=w_sd,
+        w_mn=weather_mean,
+        w_sd=weather_std,
     )
 
 frcst_st_dt  = end_dt_w
@@ -177,11 +186,15 @@ if (
 ):
     print("Warning: input data outside range of (-1,1) found")
 
+# %% [markdown]
+# ### Load Model
 
 # %%
 # read model and weather normalization stats
 model = tf.keras.models.load_model(CONSTANTS["modelh5"], compile=False)
 
+# %% [markdown]
+# ### Model Predictions
 
 # %%
 # model prediction
@@ -215,15 +228,15 @@ import time
 from IPython import display
 from rasterio.plot import show
 
-output_dir = CONSTANTS["results_folder"]
-ref_tif = sat_links1.filePath.values[0]
+output_dir = "results/"
+ref_tif = sat_links.filePath.values[0]
 with rasterio.open(ref_tif) as src:
     ras_meta = src.profile
 
 
 # %%
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
-    data_array = np.array(tmp_df[coln]).reshape(src.shape)
+    data_array = np.array(pred_df[coln]).reshape(src.shape)
     with rasterio.open(os.path.join(output_dir, coln + '.tif'), 'w', **ras_meta) as dst:
         dst.write(data_array, indexes=1)
 
