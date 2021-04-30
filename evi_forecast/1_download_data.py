@@ -98,6 +98,7 @@ try:
             farmer_id=farmer_id,
             farmer=Farmer()
         )
+        print("Done")
 except Exception as e:
     print(e)
 
@@ -366,5 +367,4 @@ for boundary_obj in boundary_objs:
 
     w_df = WeatherUtil.get_weather_data_df(weather_data)
     w_df.to_csv(os.path.join(root_dir, boundary.id + "_forecast.csv"), index=False)
-
 
