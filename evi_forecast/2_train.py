@@ -40,7 +40,7 @@ root_dir = CONSTANTS['root_dir']
 # #### Load satellite data  local paths
 
 # %%
-sat_links = pd.read_csv(os.path.join(CONSTANTS["results_folder"], "satellite_paths.csv"))
+sat_links = pd.read_csv(os.path.join(CONSTANTS["results_dir"], "satellite_paths.csv"))
 sat_links["fileExist"] = sat_links.filePath.apply(os.path.exists)
 sat_links.head()
 
@@ -74,7 +74,7 @@ weather_parms = [
     'windSpeed2mMax-mph', 
     'windSpeed2mMin-mph', 
     'windSpeedMax-mph', 
-    'windSpeedMin-mph
+    'windSpeedMin-mph'
 ]
 
 # %% [markdown]
@@ -94,7 +94,7 @@ trainval = (
 
 
 # Check for weather file exists or not
-trainval["w_exists"] = (os.path.join(root_dir, trainval["boundaryId"] + "_historical.csv")).apply(
+trainval["w_exists"] = (trainval["boundaryId"] + "_historical.csv").apply(lambda x: os.path.join(root_dir, x)).apply(
     os.path.exists
 )
 
@@ -113,6 +113,21 @@ trainval = pd.concat([trainval]*2, ignore_index=True)
 trainval.loc[1,'trainval'] = 'Val'
 trainval
 
+
+# %%
+print(trainval)
+
+
+# %%
+# get mean and standard deviation of training data weather parameters for normalization
+w_stats = pd.concat(
+    [
+        pd.read_csv(os.path.join(root_dir, x + "_historical.csv"))
+        for x in trainval.query('trainval == "Train"').boundaryId.values
+    ],
+    axis=0,
+)[weather_parms].agg({"mean", "std"})
+
 # %% [markdown]
 # ### Get weather statistics for Normalization
 
@@ -120,13 +135,15 @@ trainval
 # get mean and standard deviation of training data weather parameters for normalization
 w_stats = pd.concat(
     [
-        pd.read_csv(os.path.join(root_dir, trainval["boundaryId"] + "_historical.csv"))
+        pd.read_csv(os.path.join(root_dir, x + "_historical.csv"))
         for x in trainval.query('trainval == "Train"').boundaryId.values
     ],
     axis=0,
 )[weather_parms].agg({"mean", "std"})
-weather_mean = w_stats.filter(like="mean", axis=0)[w_parms].values
-weather_std = w_stats.filter(like="std", axis=0)[w_parms].values
+
+
+weather_mean = w_stats.filter(like="mean", axis=0)[weather_parms].values
+weather_std = w_stats.filter(like="std", axis=0)[weather_parms].values
 
 # Save weather parameters normalization stats
 os.makedirs(os.path.dirname(CONSTANTS["w_pkl"]), exist_ok=True)
@@ -144,21 +161,21 @@ def get_ARD(boundaryId):
     )
      
     # in reading w_df, if error occurs with farm_code, change it to field_id
-    w_df = pd.read_csv(os.path.join(root_dir, trainval["boundaryId"] + "_historical.csv"))
+    w_df = pd.read_csv(os.path.join(root_dir, boundaryId + "_historical.csv"))
     
     da_pc = ard_preprocess(
         sat_file_links=boundary_id_sat_links,
         w_df=w_df,
-        sat_res_x=CONSTANTS["sat_res_x_model"],
+        sat_res_x=2,
         var_name=CONSTANTS["var_name"],
         interp_date_start=CONSTANTS["interp_date_start"],
         interp_date_end=CONSTANTS["interp_date_end"],
-        w_parms=w_parms,
+        w_parms=weather_parms,
         input_days=CONSTANTS["input_days"],
         output_days=CONSTANTS["output_days"],
         ref_tm=CONSTANTS["ref_tm_model"],
-        w_mn=w_mn,
-        w_sd=w_sd,
+        w_mn=weather_mean,
+        w_sd=weather_std,
     )
     return da_pc.query(
         "nan_input_evi and nan_input_w and nan_output_evi and nan_output_w and input_evi_le1 and output_evi_le1"
