@@ -259,7 +259,7 @@ Y_val = np.array(data_val.output_evi.to_list())
 # Save Analysis Ready Dataset (ARD)
 os.makedirs(os.path.dirname(CONSTANTS["ardpkl"]), exist_ok=True)
 with open(CONSTANTS["ardpkl"], "wb") as f:
-    pickle.dump(da_fin, f)
+    pickle.dump(data, f)
 
 
 # ### Model Architecture
@@ -315,7 +315,7 @@ def get_model(input_weather, x, y, z):
 # In[ ]:
 
 
-model = get_model(len(w_parms), 100, 100, 100)
+model = get_model(len(weather_parms), 100, 100, 100)
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.1, momentum=0.9)
 model.compile(loss="mse", optimizer=optimizer, metrics=["mse"])
 # Model run
@@ -323,7 +323,7 @@ training_history = model.fit(
     X_train,
     Y_train,
     epochs=20,
-    verbose=0,
+    verbose=1,
     validation_data=(X_val, Y_val),
     callbacks=[],
     batch_size=1000,
