@@ -76,6 +76,7 @@ def ard_preprocess(
     )
     
     # lowess smoothing to remove outliers and cubic spline interpolation
+    data_array = data_array.sort_index(ascending=True)   ## Sort before calculating xvals
     xvals = (pd.Series(data_array.index) - data_array.index.values[0]).dt.days
     data_inter = pd.DataFrame(
         {
