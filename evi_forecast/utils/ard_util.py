@@ -62,11 +62,11 @@ def ard_preprocess(
                 ("time", pd.to_datetime(sat_file_links.sceneDateTime).dt.date),
                 (
                     "lat",
-                    getgeo1[2] + getgeo1[0] * sat_res_x * np.arange(sat_data1.shape[1]),
+                    getgeo1[5] + getgeo1[4] * sat_res_x * np.arange(sat_data1.shape[1]),
                 ),
                 (
                     "long",
-                    getgeo1[5] + getgeo1[4] * sat_res_x * np.arange(sat_data1.shape[2]),
+                    getgeo1[2] + getgeo1[0] * sat_res_x * np.arange(sat_data1.shape[2]),
                 ),
             ],
         )

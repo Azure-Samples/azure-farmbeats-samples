@@ -85,7 +85,7 @@ fb_client = FarmBeatsClient(
 
 
 RUN_ID = uuid.uuid1()  # This helps in creating unique job id everytime you run
-NO_BOUNDARIES = 10  # Defaults 10;
+NO_BOUNDARIES = 3  # Defaults 3;
 root_dir = CONSTANTS['root_dir']  # Satellite data gets downloaded here
 
 

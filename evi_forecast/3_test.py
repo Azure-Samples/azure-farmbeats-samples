@@ -145,7 +145,7 @@ w_df_forecast = WeatherUtil.get_weather_data_df(weather_data)
 
 
 # merge weather data
-weather_df = pd.concat([w_df_hist, w_df_forecast], axis=0)
+weather_df = pd.concat([w_df_hist, w_df_forecast], axis=0, ignore_index=True)
 
 with open(CONSTANTS["w_pkl"], "rb") as f:
     w_parms, weather_mean, weather_std = pickle.load(f)

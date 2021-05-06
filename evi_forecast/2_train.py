@@ -25,6 +25,12 @@ import pandas as pd
 import tensorflow as tf
 from tensorflow import keras
 
+# Disable unnecessary logs 
+import logging
+logging.disable(sys.maxsize)
+import warnings
+warnings.filterwarnings("ignore")
+
 # Local  imports
 from utils.config import farmbeats_config
 from utils.constants import CONSTANTS
@@ -211,7 +217,7 @@ with ThreadPoolExecutor(max_workers=100) as executor:
 # In[ ]:
 
 
-ards_fetch[0].result()
+ards_fetch[0].result() # sample model input xarray of first boundary
 
 
 # In[ ]:
