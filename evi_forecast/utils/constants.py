@@ -15,8 +15,8 @@ CONSTANTS= {
     "output_days": 10,  # number of days of weather forecast
     "ref_tm_model": "10-05-2020",  # start of growing season
     "sat_res_x_model": 10,  # spatial sampling in model training, this might differ for inferance
-    "interp_date_start": "01-05-2020",  # model iterpolation start date
-    "interp_date_end": "30-04-2021",  # model iterpolation start date
+    "interp_date_start": "10-04-2020",  # model iterpolation start date
+    "interp_date_end": "30-11-2020",  # model iterpolation start date
     
     # model results filenames
     "results_dir": "results/",

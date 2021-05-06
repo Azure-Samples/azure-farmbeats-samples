@@ -181,7 +181,7 @@ def get_ARD(boundaryId):
     da_pc = ard_preprocess(
         sat_file_links=boundary_id_sat_links,
         w_df=w_df,
-        sat_res_x=2,
+        sat_res_x=20,
         var_name=CONSTANTS["var_name"],
         interp_date_start=CONSTANTS["interp_date_start"],
         interp_date_end=CONSTANTS["interp_date_end"],

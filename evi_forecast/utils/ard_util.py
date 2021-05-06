@@ -176,4 +176,8 @@ def ard_preprocess(
     da3["nan_output_w"] = [
         np.sum(np.isnan(np.array(x))) == 0 for x in da3.forecast_weather.values
     ]
+
+    # Re-index based on lat and long
+    da3.sort_values(by=['lat_','long_'], ascending=[False, True], inplace=True)
+    
     return da3
