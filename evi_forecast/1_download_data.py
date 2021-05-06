@@ -51,8 +51,8 @@ from azure.identity import ClientSecretCredential
 # SDK imports
 from azure.farmbeats import FarmBeatsClient
 from azure.farmbeats.models import (Farmer, Boundary, Polygon,
-                                    SatelliteIngestionJobRequest,
-                                    WeatherIngestionJobRequest, 
+                                    SatelliteDataIngestionJob,
+                                    WeatherDataIngestionJob, 
                                     SatelliteData)
 
 
@@ -187,7 +187,7 @@ for i, boundary_obj in enumerate(boundary_objs):
         print("Queuing satellite job... ", end="", flush=True)
         satellite_job = fb_client.scenes.begin_create_satellite_data_ingestion_job(
             job_id=job_id,
-            job=SatelliteIngestionJobRequest(
+            job=SatelliteDataIngestionJob(
                 farmer_id=boundary_obj.farmer_id,
                 boundary_id=boundary_obj.id,
                 start_date_time=start_dt,
@@ -256,7 +256,7 @@ for i, boundary_obj in enumerate(boundary_objs):
         print("Queuing weather job... ", end="", flush=True)
         weather_job = fb_client.weather.begin_create_data_ingestion_job(
             job_id=job_id,
-            job=WeatherIngestionJobRequest(
+            job=WeatherDataIngestionJob(
                 farmer_id=boundary_obj.farmer_id,
                 boundary_id=boundary_obj.id,
                 extension_id=extension_id, 
@@ -302,13 +302,13 @@ START = 0
 END = 10
 extension_api_name = "dailyforecast"
 for i, boundary_obj in enumerate(boundary_objs):
-    job_id = "w-forecast" + str(i) + str(RUN_ID)
+    job_id = "w-forecast"+ str(i) + str(RUN_ID)
     
     try:
         print("Queuing weather job... ", end="", flush=True)
         weather_job = fb_client.weather.begin_create_data_ingestion_job(
             job_id=job_id,
-            job=WeatherIngestionJobRequest(
+            job=WeatherDataIngestionJob(
                 farmer_id=boundary_obj.farmer_id,
                 boundary_id=boundary_obj.id,
                 extension_id=extension_id,

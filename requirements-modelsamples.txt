@@ -8,4 +8,4 @@ xarray
 statsmodels==0.12.2
 
 # local packages
-azure_farmbeats-0.1.0-py3-none-any.whl
+../azure_farmbeats-0.1.0-py3-none-any.whl
