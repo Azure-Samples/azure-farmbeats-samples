@@ -1,22 +1,47 @@
-from datetime import datetime, timedelta
+# +
+# Stanadard library imports
 import json
-import numpy as np
-import os
-import pandas as pd
 import pickle
+import os
+import sys
+import requests
+from datetime import datetime,timedelta
+
+# Disable unnecessary logs 
+import logging
+logging.disable(sys.maxsize)
+import warnings
+warnings.filterwarnings("ignore")
+
+# Third party library imports
+import numpy as np
+import pandas as pd
+import rasterio
 import tensorflow as tf
 from tensorflow import keras
-from utils.ard_util import ard_preprocess
-import requests
-from utils.satellite_util import SatelliteUtil
+
+# Local imports
+from utils.config import farmbeats_config
 from utils.weather_util import WeatherUtil
+from utils.satellite_util import SatelliteUtil
+from utils.constants import CONSTANTS
+from utils.ard_util import ard_preprocess
+
+# Azure imports
+from azure.identity import ClientSecretCredential
+
+# SDK imports
+from azure.farmbeats import FarmBeatsClient
+
+
+# -
 
 # Called when the deployed service starts
 def init():
     global model
     global w_parms
-    global w_mn
-    global w_sd
+    global weather_mean
+    global weather_std
     # read model and weather normalization stats
     model_path = os.getenv("AZUREML_MODEL_DIR") + "/"
     model = tf.keras.models.load_model(model_path + CONSTANTS["modelh5"], compile=False)
@@ -42,7 +67,7 @@ def call_farmbeats(farmbeats_config):
     )
     return fb_client
 
-def get_ARD_config(fb_client, boundary_id):
+def get_ARD_df_scoring(fb_client, farmer_id, boundary_id):
     
     end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
     start_dt = end_dt - timedelta(days=60)
@@ -53,6 +78,7 @@ def get_ARD_config(fb_client, boundary_id):
                 boundary_id=boundary_id
             )
     
+    root_dir = CONSTANTS['root_dir']
     sat_links = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
 
     # get last available data of satellite data
@@ -119,12 +145,13 @@ def run(data):
     try:
         parms = json.loads(data)
         fb_client = call_farmbeats(parms["config"])
+        farmer_id = parms["farmer_id"]
         boundary_id = parms["boundary_id"]
         sat_res_x = parms.get("sat_res_x", 1)
         var_name = parms.get("var_name", "NDVI")
         sat_data_days = parms.get("sat_data_days", 60)
-        if parms["sat_data_days"] < 30:
-            parms["sat_data_days"] = 60
+        if sat_data_days < 30:
+            sat_data_days = 60
             print("Note: Satellite data for last 60 days will be downloaded")
             
         # prepare ARD for new data
@@ -132,6 +159,7 @@ def run(data):
         # forecast will be done for 10 days from last available scene
         ard, frcst_st_dt = get_ARD_df_scoring(
             fb_client, 
+            farmer_id,
             boundary_id 
             )
         

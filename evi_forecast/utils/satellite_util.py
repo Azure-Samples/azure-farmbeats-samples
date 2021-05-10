@@ -28,6 +28,8 @@ class SatelliteUtil:
         file_path = self.parse_file_path_from_file_link(file_link)
         out_path = Path(os.path.join(root_dir, file_path))
         out_path.parent.mkdir(parents=True, exist_ok=True)
+        if Path(out_path).exists():
+            return out_path
         with open(out_path, 'wb') as tif_file:
             file_stream = self.farmbeats_client.scenes.download(file_path)
             for bits in file_stream:

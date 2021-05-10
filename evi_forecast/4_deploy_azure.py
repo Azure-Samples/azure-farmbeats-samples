@@ -8,6 +8,7 @@
 
 from azureml.core import Workspace
 from azureml.core.compute import AmlCompute, AksCompute, ComputeTarget
+from azureml.core.compute_target import ComputeTargetException
 from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.environment import Environment
 from azureml.core.model import InferenceConfig, Model
@@ -43,7 +44,7 @@ model = Model.register(
 # In[ ]:
 
 
-model = Model(name="NDVI_forecast_files", workspace=ws)
+model = Model(name="NDVI_forecast_model", workspace=ws)
 
 
 # #### Create Environment
@@ -51,27 +52,29 @@ model = Model(name="NDVI_forecast_files", workspace=ws)
 # In[ ]:
 
 
+py_version = "3.6.9"
+
 conda_reqs = [
     "conda==4.7.12",
     "tensorflow==2.1.0",
     "scipy==1.4.1",
     "tensorboard==2.1.0",
-    "rasterio",
-    "scikit-learn",
-    "xarray",
-    "shapely",
+    "scikit-learn"
 ]
 
 pip_reqs = [
     "petastorm",
     "torchvision",
     "pyarrow",
-    "statsmodels",
-    "geotiff",
     "azureml-defaults",
+    "geopandas==0.7.0",
+    "numpy",
+    "pandas==1.0.3",
+    "rasterio==1.1.5",
+    "shapely==1.7.0",
+    "xarray",
+    "statsmodels==0.12.2"
 ]
-
-py_version = "3.7.7"
 
 myenv = Environment(name="myenv")
 conda_dep = CondaDependencies()
@@ -127,7 +130,7 @@ deployment_config = AksWebservice.deploy_configuration(
 
 service = Model.deploy(
     ws,
-    CONSTANTS["service_name"],
+    "ndviforecastservice",
     [model],
     inference_config,
     deployment_config,
@@ -135,6 +138,29 @@ service = Model.deploy(
     overwrite=True,
 )
 service.wait_for_deployment(True)
+
+
+# In[ ]:
+
+
+service.get_logs()
+
+
+# In[ ]:
+
+
+print(ws.webservices)
+
+# Choose the webservice you are interested in
+
+
+# In[ ]:
+
+
+from azureml.core import Webservice
+
+service = Webservice(ws, 'ndviforecastservice')
+print(service.get_logs())
 
 
 # In[ ]:
