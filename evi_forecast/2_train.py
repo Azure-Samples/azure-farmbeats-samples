@@ -120,10 +120,10 @@ trainval = trainval.query("w_exists")
 # In[ ]:
 
 
-# Split data into train and validation sets in 80% and 20% respectively
+# Split data into train and validation sets in ~70% and ~30% respectively
 np.random.seed(10)
 trainval["trainval"] = np.where(
-    np.random.uniform(0, 1, trainval.shape[0]) < 0.8, "Train", "Val"
+    np.random.uniform(0, 1, trainval.shape[0]) < 0.7, "Train", "Val"
 )
 
 

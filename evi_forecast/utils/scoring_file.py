@@ -67,10 +67,17 @@ def call_farmbeats(farmbeats_config):
     )
     return fb_client
 
-def get_ARD_df_scoring(fb_client, farmer_id, boundary_id):
+def get_ARD_df_scoring(fb_client, farmer_id, boundary_id, boundary_geometry):
     
     end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
     start_dt = end_dt - timedelta(days=60)
+
+    # Create Boundary and get satelite and weather (historical and forecast)
+    get_sat_weather_data(fb_client, 
+                    farmer_id, 
+                    boundary_polygon, 
+                    start_date, 
+                    end_date)
 
     # get boundary object
     boundary = fb_client.boundaries.get(
