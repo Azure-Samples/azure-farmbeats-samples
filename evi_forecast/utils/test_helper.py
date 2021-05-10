@@ -23,7 +23,7 @@ from azure.farmbeats.models import (Farmer, Boundary, Polygon,
                                     SatelliteData)
 
 
-def get_sat_weather_data(fb_client, farmer_id, boundary_polygon, start_date, end_date):
+def get_sat_weather_data(fb_client, farmer_id, boundary_id, boundary_polygon, start_dt, end_dt):
 
     # Create Farmer
     farmer = fb_client.farmers.get(farmer_id=farmer_id)
@@ -36,36 +36,33 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_polygon, start_date, end
             farmer=Farmer()
         )
     # Create boundary
-    boundary_id = "boundary" + str(i)
-        try:
-            boundary = fb_client.boundaries.get(
+    try:
+        boundary = fb_client.boundaries.get(
+            farmer_id=farmer_id,
+            boundary_id=boundary_id
+        )
+        if boundary is not None:
+            print(f"Boundary with id {boundary.id} Exist", end="\n")
+        else:
+            print(f"Creating boundary with id {boundary_id}... ", end="")
+            boundary = fb_client.boundaries.create_or_update(
                 farmer_id=farmer_id,
-                boundary_id=boundary_id
-            )
-            if boundary is not None:
-                print(f"Boundary with id {boundary.id} Exist", end="\n")
-            else:
-                print(f"Creating boundary with id {boundary_id}... ", end="")
-                boundary = fb_client.boundaries.create_or_update(
-                    farmer_id=farmer_id,
-                    boundary_id=boundary_id,
-                    boundary=Boundary(
-                        description="Created by SDK",
-                        geometry=Polygon(
-                            coordinates=[
-                                boundary_polygon
-                            ]
-                        )
+                boundary_id=boundary_id,
+                boundary=Boundary(
+                    description="Created by SDK",
+                    geometry=Polygon(
+                        coordinates=[
+                            boundary_polygon
+                        ]
                     )
                 )
-                print("Created")
-        except Exception as e:
-            print(e)
+            )
+            print("Created")
+    except Exception as e:
+        print(e)
 
     # Satelitte job and check status of it
-
-    sat_job_id = "satellitejob"+ str(i) + str(uuid.uuid1())
-    
+    sat_job_id = "satellitejob"+ str(uuid.uuid1())
     try:
         print("Queuing satellite job... ", end="", flush=True)
         satellite_job = fb_client.scenes.begin_create_satellite_data_ingestion_job(
@@ -94,8 +91,12 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_polygon, start_date, end
         raise
 
     # Weather (historical) job and status of it
+    extension_id = farmbeats_config["weather_provider_extension_id"]
+    extension_data_provider_api_key = farmbeats_config["weather_provider_key"]
+    extension_data_provider_app_id = farmbeats_config["weather_provider_id"]
+    extension_api_name = "dailyhistorical"
 
-    w_hist_job_id = "w-historical" + str(i) + str(RUN_ID)
+    w_hist_job_id = "w-historical" + str(uuid.uuid1())
     st_unix = int(start_dt.timestamp())
     ed_unix = int(end_dt.timestamp())
     try:
@@ -119,8 +120,8 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_polygon, start_date, end
         raise
 
     # Weather (forecast) job and status of it
-
-    w_forecast_job_id = "w-forecast"+ str(i) + str(RUN_ID)
+    extension_api_name = "dailyforecast"
+    w_forecast_job_id = "w-forecast"+ str(uuid.uuid1())
     
     try:
         print("Queuing weather job... ", end="", flush=True)
@@ -131,7 +132,7 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_polygon, start_date, end
                 boundary_id=boundary.id,
                 extension_id=extension_id,
                 extension_api_name=extension_api_name,
-                extension_api_input={"start": START, "end": END},
+                extension_api_input={"start": 0, "end": 10},
                 extension_data_provider_api_key=extension_data_provider_api_key,
                 extension_data_provider_app_id=extension_data_provider_app_id
             ),
@@ -143,11 +144,11 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_polygon, start_date, end
         raise
 
     # Wait for all 3 jobs
-    print(sat_job.result())
-    print(weather_hist_job.result())
-    print(weather_forecast_job.result())
+    satellite_job.result()
+    weather_hist_job.result()
+    weather_forecast_job.result()
 
     # Status of Jobs and raise error if any job fails
-    print(sat_job.status())
+    print(satellite_job.status())
     print(weather_hist_job.status())
     print(weather_forecast_job.status())

@@ -39,7 +39,6 @@ from utils.satellite_util import SatelliteUtil
 from utils.test_helper import get_sat_weather_data
 from utils.weather_util import WeatherUtil
 
-
 # Azure imports
 from azure.identity import ClientSecretCredential
 
@@ -77,32 +76,45 @@ fb_client = FarmBeatsClient(
 # In[ ]:
 
 
-root_dir = CONSTANTS['root_dir']
-farmer_id = "annaresh_farmer"
-boundary_id = "boundary1-annaresh" # TODO: Check later for geometry also
-bonudary_geometry = '[[-88.55981782720959, 39.767198541032606], [-88.54924932608098, 39.766569945555425], [-88.55007951533537, 39.75856308368464], [-88.56064684852868, 39.75919160723301], [-88.55981782720959, 39.767198541032606]]'
+farmer_id = "contoso_farmer"
+boundary_id = "sample-boundary-2" # TODO: Check later for geometry also
+bonudary_geometry = '[[79.2900037765503,18.001060134232404],[79.30253505706787,18.001060134232404],[79.30253505706787,18.01522225664995],[79.2900037765503,18.01522225664995],[79.2900037765503, 18.001060134232404]]'
 
+#TODO: Check if end_dt is not less than current date
 end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
-
-#TODO: Check if end_dt is not today's date
-
-
 start_dt = end_dt - timedelta(days=60)
-
-# Create Boundary and get satelite and weather (historical and forecast)
-get_sat_weather_data(fb_client, 
-                farmer_id, 
-                boundary_polygon, 
-                start_date, 
-                end_date)
-
-# Get boundary object
 
 
 # In[ ]:
 
 
-sat_links = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary_obj], start_dt, end_dt, root_dir)
+# Create Boundary and get satelite and weather (historical and forecast)
+get_sat_weather_data(fb_client, 
+                farmer_id, 
+                boundary_id,
+                json.loads(bonudary_geometry), 
+                start_dt, 
+                end_dt)
+
+# get boundary object
+boundary = fb_client.boundaries.get(
+            farmer_id=farmer_id,
+            boundary_id=boundary_id
+        )
+
+
+# In[ ]:
+
+
+boundary.as_dict()
+
+
+# In[ ]:
+
+
+root_dir = CONSTANTS['root_dir']
+
+sat_links = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
 
 # get last available data of satellite data
 end_dt_w = datetime.strptime(

@@ -151,8 +151,6 @@ service.get_logs()
 
 print(ws.webservices)
 
-# Choose the webservice you are interested in
-
 
 # In[ ]:
 

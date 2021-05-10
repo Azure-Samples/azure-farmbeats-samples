@@ -21,11 +21,12 @@ import tensorflow as tf
 from tensorflow import keras
 
 # Local imports
-from utils.config import farmbeats_config
-from utils.weather_util import WeatherUtil
-from utils.satellite_util import SatelliteUtil
-from utils.constants import CONSTANTS
 from utils.ard_util import ard_preprocess
+from utils.config import farmbeats_config
+from utils.constants import CONSTANTS
+from utils.satellite_util import SatelliteUtil
+from utils.test_helper import get_sat_weather_data
+from utils.weather_util import WeatherUtil
 
 # Azure imports
 from azure.identity import ClientSecretCredential
@@ -75,9 +76,10 @@ def get_ARD_df_scoring(fb_client, farmer_id, boundary_id, boundary_geometry):
     # Create Boundary and get satelite and weather (historical and forecast)
     get_sat_weather_data(fb_client, 
                     farmer_id, 
-                    boundary_polygon, 
-                    start_date, 
-                    end_date)
+                    boundary_id,
+                    boundary_geometry, 
+                    start_dt, 
+                    end_dt)
 
     # get boundary object
     boundary = fb_client.boundaries.get(
@@ -154,6 +156,7 @@ def run(data):
         fb_client = call_farmbeats(parms["config"])
         farmer_id = parms["farmer_id"]
         boundary_id = parms["boundary_id"]
+        boundary_geometry = parms["bonudary_geometry"]
         sat_res_x = parms.get("sat_res_x", 1)
         var_name = parms.get("var_name", "NDVI")
         sat_data_days = parms.get("sat_data_days", 60)
@@ -167,7 +170,8 @@ def run(data):
         ard, frcst_st_dt = get_ARD_df_scoring(
             fb_client, 
             farmer_id,
-            boundary_id 
+            boundary_id, 
+            boundary_geometry
             )
         
         # raise exception if ARD is empty
