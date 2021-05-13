@@ -6,6 +6,15 @@
 # In[ ]:
 
 
+# System Imports
+import glob
+import os
+import pickle
+
+# Local Imports
+from utils.constants import CONSTANTS
+
+# Azure Imports
 from azureml.core import Workspace
 from azureml.core.compute import AmlCompute, AksCompute, ComputeTarget
 from azureml.core.compute_target import ComputeTargetException
@@ -13,11 +22,6 @@ from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.environment import Environment
 from azureml.core.model import InferenceConfig, Model
 from azureml.core.webservice import AksWebservice
-import glob
-import pickle
-from utils.constants import CONSTANTS
-
-import os
 
 
 # #### Import Workspace Config

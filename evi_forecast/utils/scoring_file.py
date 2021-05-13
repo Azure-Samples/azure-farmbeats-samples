@@ -147,7 +147,7 @@ def get_ARD_df_scoring(fb_client, farmer_id, boundary_id, boundary_geometry):
 
     frcst_st_dt  = end_dt_w
     
-    return ard, frcst_st_dt
+    return ard, frcst_st_dt, sat_links.filePath.values[0]
 
 # Handle requests to the service
 def run(data):
@@ -167,7 +167,7 @@ def run(data):
         # prepare ARD for new data
         # frcst_st_dt reprresents last available scene of satellite
         # forecast will be done for 10 days from last available scene
-        ard, frcst_st_dt = get_ARD_df_scoring(
+        ard, frcst_st_dt, ref_tif = get_ARD_df_scoring(
             fb_client, 
             farmer_id,
             boundary_id, 
@@ -211,7 +211,10 @@ def run(data):
         tmp_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
             lat=ard.lat_.values, long=ard.long_.values
         )
-        return tmp_df.to_dict()
+
+        # Prepare result and return output
+        result = {'ref_tif': ref_tif, 'model_preds': tmp_df.to_dict()}
+        return result
     
     except Exception as e:
         error = str(e)

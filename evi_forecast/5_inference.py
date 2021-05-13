@@ -3,16 +3,22 @@
 
 # # Inference
 
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# 
+# Licensed under the MIT License.
+
 # In[ ]:
 
 
-import numpy as np
-import requests
+# System Imports
 import json
+import os
+import numpy as np
 import pandas as pd
-import pickle
+import requests
 from datetime import datetime
 
+# Local Imports
 from utils.config import farmbeats_config
 
 
@@ -53,10 +59,12 @@ response = requests.post(
 )
 
 
+# ### Model Response Body
+
 # In[ ]:
 
 
-response.json()
+print(response.json())
 
 
 # In[ ]:
@@ -69,6 +77,44 @@ print(response.elapsed)
 # In[ ]:
 
 
-res1 = pd.DataFrame.from_dict(response.json())
-print(res1.head())
+pred_df = pd.DataFrame.from_dict(response['model_preds'].json())
+print(pred_df.head())
+
+
+# ### Write output to tif files
+
+# In[ ]:
+
+
+get_ipython().run_line_magic('matplotlib', 'inline')
+import time
+from IPython import display
+from rasterio.plot import show
+
+output_dir = "results/"
+ref_tif = response['ref_tif']
+with rasterio.open(ref_tif) as src:
+    ras_meta = src.profile
+
+
+# In[ ]:
+
+
+for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
+    data_array = np.array(pred_df[coln]).reshape(src.shape)
+    with rasterio.open(os.path.join(output_dir, coln + '.tif'), 'w', **ras_meta) as dst:
+        dst.write(data_array, indexes=1)
+
+
+# ### Visualize Outputs
+
+# In[ ]:
+
+
+for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
+    src = rasterio.open(os.path.join(output_dir, coln + '.tif'))
+    show(src.read(), transform=src.transform, title=coln)
+    #show_hist(src)
+    display.clear_output(wait=True)
+    time.sleep(1) 
 

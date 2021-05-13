@@ -92,7 +92,7 @@ def ard_preprocess(
     )
 
     # Read Weather Data and normalization
-    w_df[w_parms] = (w_df[w_parms] - w_mn) / w_sd
+    w_df[w_parms] = (w_df[w_parms] - w_mn) / (np.maximum(w_sd, 0.001))
     w_df["time"] = pd.to_datetime(w_df.dateTime).dt.date
     
     # combine interpolated satellite data array with weather data
