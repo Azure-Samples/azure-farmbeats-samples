@@ -5,9 +5,13 @@
 # 
 # Licensed under the MIT License.
 
-# # Test EVI Forecast (local)
+# # EVI Forecast on Area of Interest (AOI)
+# This notebook demonstrates, how to load the model which has been trained using previous notebook, 2_train.ipynb and forecast EVI for next 10 days on new Area of Interest.
+# 
 
-# In[1]:
+# ### Import Libraries
+
+# In[ ]:
 
 
 # Stanadard library imports
@@ -48,7 +52,7 @@ from azure.farmbeats import FarmBeatsClient
 
 # ### Farmbeats Configuration
 
-# In[2]:
+# In[ ]:
 
 
 # FarmBeats Client definition
@@ -69,11 +73,11 @@ fb_client = FarmBeatsClient(
 )
 
 
-# ### Forecast EVI for test Boundary
+# ### Forecast EVI for new AOI
 
 # #### Satellie Data
 
-# In[3]:
+# In[ ]:
 
 
 farmer_id = "contoso_farmer"
@@ -85,7 +89,7 @@ end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
 start_dt = end_dt - timedelta(days=60)
 
 
-# In[4]:
+# In[ ]:
 
 
 # Create Boundary and get satelite and weather (historical and forecast)
@@ -103,13 +107,13 @@ boundary = fb_client.boundaries.get(
         )
 
 
-# In[5]:
+# In[ ]:
 
 
 boundary.as_dict()
 
 
-# In[6]:
+# In[ ]:
 
 
 root_dir = CONSTANTS['root_dir']
@@ -126,7 +130,7 @@ start_dt_w = end_dt_w - timedelta(days=CONSTANTS["input_days"] - 1)
 
 # #### Weather Data
 
-# In[7]:
+# In[ ]:
 
 
 # get weather data historical
@@ -144,7 +148,7 @@ for w_data in weather_list:
 w_df_hist = WeatherUtil.get_weather_data_df(weather_data)
 
 
-# In[8]:
+# In[ ]:
 
 
 # get weather data forecast
@@ -163,7 +167,7 @@ for w_data in weather_list:
 w_df_forecast = WeatherUtil.get_weather_data_df(weather_data)
 
 
-# In[9]:
+# In[ ]:
 
 
 # merge weather data
@@ -175,7 +179,7 @@ with open(CONSTANTS["w_pkl"], "rb") as f:
 
 # ### Prepare ARD for test boundary
 
-# In[10]:
+# In[ ]:
 
 
 ard = ard_preprocess(
@@ -196,7 +200,7 @@ ard = ard_preprocess(
 frcst_st_dt  = end_dt_w
 
 
-# In[11]:
+# In[ ]:
 
 
 # raise exception if ARD is empty
@@ -225,7 +229,7 @@ if (
 
 # ### Load Model
 
-# In[12]:
+# In[ ]:
 
 
 # read model and weather normalization stats
@@ -234,7 +238,7 @@ model = tf.keras.models.load_model(CONSTANTS["modelh5"], compile=False)
 
 # ### Model Predictions
 
-# In[13]:
+# In[ ]:
 
 
 # model prediction
@@ -256,15 +260,15 @@ pred_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
 )
 
 
-# In[14]:
+# In[ ]:
 
 
 pred_df.head()
 
 
-# ### Write output to TIF files
+# ### Write Output to TIF files
 
-# In[15]:
+# In[ ]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -278,7 +282,7 @@ with rasterio.open(ref_tif) as src:
     ras_meta = src.profile
 
 
-# In[16]:
+# In[ ]:
 
 
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
@@ -289,7 +293,7 @@ for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
 
 # ### Visualize EVI Forecast Maps
 
-# In[17]:
+# In[ ]:
 
 
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude

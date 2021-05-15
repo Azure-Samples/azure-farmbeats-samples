@@ -1,11 +1,13 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Inference
+# # Inference: EVI Forecast on Area of Interest using ML Webservice
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # 
 # Licensed under the MIT License.
+
+# ### Import libraries
 
 # In[ ]:
 
@@ -25,6 +27,8 @@ import pandas as pd
 from utils.config import farmbeats_config
 
 
+# ### Load the service endpoint and token
+
 # In[ ]:
 
 
@@ -36,6 +40,8 @@ with open("results//service_uri.pkl", "rb") as f:
     scoring_uri, token = pickle.load(f)
 
 
+# ### Area of Interest (AOI) for inference
+
 # In[ ]:
 
 
@@ -43,6 +49,8 @@ farmer_id = "contoso_farmer"
 boundary_id = "sample-boundary-2" # TODO: Check later for geometry also
 bonudary_geometry = "[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]"
 
+
+# ### Send Request to WebService
 
 # In[ ]:
 
@@ -77,6 +85,8 @@ print(response.status_code)
 print(response.elapsed)
 
 
+# ### Convert Model Response to DataFrame
+
 # In[ ]:
 
 
@@ -84,7 +94,7 @@ pred_df = pd.DataFrame.from_dict(response['model_preds'].json())
 print(pred_df.head())
 
 
-# ### Write output to tif files
+# ### Write Output to TIF Files
 
 # In[ ]:
 
@@ -109,7 +119,7 @@ for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
         dst.write(data_array, indexes=1)
 
 
-# ### Visualize Outputs
+# ### Visualize EVI Forecast Maps
 
 # In[ ]:
 

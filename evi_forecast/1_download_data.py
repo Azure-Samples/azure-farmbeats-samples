@@ -5,23 +5,26 @@
 # 
 # Licensed under the MIT License.
 
-# # Azure FarmBeats: Satellite and Weather Data
-# 
-# In this notebook, you learn the following things:
-# 
-# > * Create a farmer
-# > * Create boundaries
-# > * How to submit satellite and weather (historical and forecast) jobs for boundaries
-# > * Check the status of jobs
-# > * Download satellite data to local compute
-# > * Download weather data to local compute
+# # Azure FarmBeats: Satellite and Weather Data
+# 
+# In this notebook, the following things are demonstrated:
+# 
+# > * Create a Farmer
+# > * Create boundaries
+# > * How to submit satellite and weather (historical and forecast) jobs in FarmBeats PaaS for created boundaries
+# > * Check the status of jobs in FarmBeats PaaS
+# > * Download satellite data from FarmBeats PaaS to local compute
+# > * Download weather data from FarmBeats PaaS to local compute
+# 
+# 
+# In order to build EVI (Enhanced Vegetation Index) forecast model, you need satellite, historical weather and weather forecast data for the locations you want to train. This will be achieved easily using Azure FarmBeats python SDK. 
 
-# ### Import libraies
+# ### Import Libraries
 
 # In[ ]:
 
 
-get_ipython().system('pip install -r ../requirements-modelsamples.txt')
+get_ipython().system('pip install ---quiet -r ../requirements-modelsamples.txt')
 
 
 # In[ ]:
@@ -54,7 +57,7 @@ from utils.weather_util import WeatherUtil
 from azure.core.exceptions import HttpResponseError
 from azure.identity import ClientSecretCredential
 
-# SDK imports
+# Azure FarmBeats SDK imports
 from azure.farmbeats import FarmBeatsClient
 from azure.farmbeats.models import (Farmer, Boundary, Polygon,
                                     SatelliteDataIngestionJob,
@@ -62,8 +65,8 @@ from azure.farmbeats.models import (Farmer, Boundary, Polygon,
                                     SatelliteData)
 
 
-# ### Farmbeats Configuration
-# Please follow the instrucitons at "{TODO: Add file link}" to create Azue Farmbeats resource and generate client id, client secrets, etc.. These values needs to be added in config.py accordingly
+# ### FarmBeats Configuration
+# Please follow the instructions here to create Azue Farmbeats resource and generate client id, client secrets, etc.. These values need to be added in config.py in utils folder accordingly
 # 
 
 # In[ ]:
@@ -95,9 +98,9 @@ NO_BOUNDARIES = 3  # Defaults 3;
 root_dir = CONSTANTS['root_dir']  # Satellite data gets downloaded here
 
 
-# ### Create Farmer
-# 
-# Create a Farmer entity in Farmbeats system. You need to provide a farmer id as input
+# ### Create Farmer
+# 
+# Create a Farmer entity in FarmBeats system. You need to provide a farmer id as input
 
 # In[ ]:
 
@@ -117,17 +120,17 @@ except Exception as e:
     print(e)
 
 
-# ### Create Boundaries
-# 
-# Reads bounary geojson objects from a csv file and create boundary entity in Farmbeats ssytem per each geojson object. 
-# 
-# <b>Inputs:</b> Boundary geojson string, boundar id
+# ### Create Boundaries
+# 
+# Reads boundary geojson objects from a csv file and create boundary entity in FarmBeats system per each geojson object. 
+# 
+# <b>Inputs:</b> Boundary geojson string, boundary id
 
 # In[ ]:
 
 
-# farms_sample_1kmx1km.csv file contains farm boundaries curated from Crop Data Layer.
-# You can plug-in your own data file in the same format
+# farms_sample_1kmx1km.csv file contains farm boundaries curated from Crop Data Layer [(CDL)] (https://www.nass.usda.gov/Research_and_Science/Cropland/SARS1a.php). The locations spread across continental USA.  
+# You can plug-in your own locations in the same format
 locations_df = pd.read_csv(os.path.join("data","farms_sample_1kmx1km.csv"))
 locations_df["farm_boundaries"] = locations_df.farms.apply(json.loads)  # converted from string to list with numeric elements
 
@@ -169,9 +172,9 @@ for i, boundary_polygon in enumerate(boundaries):
 #TODO: If Boundary ID + Different geometry given, needs force delete existing and create new one with same ID 
 
 
-# ###  Submit Satellite Jobs
-# Create a satellite job for a given set of boundaries using Azure Farmbeats satellite_data_ingestion_job and SatelliteIngestionJobRequest() methods. 
-# This return a pollable object for each satellite job. We can query this object to know the status of each job untill gets completed.
+# ###  Submit Satellite Jobs
+# Create a satellite job for a given set of boundaries using Azure Farmbeats satellite_data_ingestion_job and SatellitDataIngestionJob() methods. 
+# This returns a pollable object for each satellite job. We can query this object to know the status of each job until gets completed. Once the job succeeded, all satellite scenes will be downloaded in PaaS for given duration and location of intereset. 
 
 # In[ ]:
 
@@ -218,8 +221,8 @@ for i, boundary_obj in enumerate(boundary_objs):
     satellite_jobs.append(satellite_job)
 
 
-# ### Check status of Satellite Jobs
-# Now, wait for the satellie jobs to be completed. We can check the status of each job which results in <i> succeeded </i> or <i> failed </i> or <i> waiting </i>. Needs further investigation for failed jobs. 
+# ### Check Status of Satellite Jobs
+# Now, wait for the satellite jobs to be completed. We can check the status of each job which results in <i> succeeded </i> or <i> failed </i> or <i> waiting </i>. Needs further investigation for failed jobs and re-run the jobs if required!! 
 
 # In[ ]:
 
@@ -234,11 +237,11 @@ for sat_job in satellite_jobs:
 # TODO: Save job ids with Job request body to track failed jobs if any!
 
 
-# ### Submit Weather (Historical) Jobs
-# 
-# Similar to satellite job, submit weather job for each boundary using azure farmbeats weather.begin_create_data_ingestion_job() and WeatherIngestionJobRequest() methods. This returns the weather job objects for each boundary. 
-# 
-# This also require the details of weather data provider that you want to use. The details are specific to weather, but typically includes extension id, APP_KEY, APP_ID, etc.
+# ### Submit Weather (Historical) Jobs
+# 
+# Similar to satellite jobs, submit weather job for each boundary using azure farmbeats weather.begin_create_data_ingestion_job() and WeatherDataIngestionJob() methods. This returns the weather job objects for each boundary. 
+# 
+# This also require the details of weather data provider that you want to use. The details are specific to weather, but typically includes extension id, APP_KEY, APP_ID, etc. and these needs to be added to config.py acoordingly
 
 # In[ ]:
 
@@ -280,7 +283,7 @@ for i, boundary_obj in enumerate(boundary_objs):
     weather_jobs.append(weather_job)
 
 
-# ### Check status of Weather (Historical) Jobs
+# ### Check Status of Weather (Historical) Jobs
 # Wait for weather jobs to get completed. Log the weather job ids which have failed and can be investigated further. The failed jobs can be submitted again the same weather.begin_create_data_ingestion_job() method. 
 
 # In[ ]:
@@ -297,8 +300,8 @@ for wth_job in weather_jobs:
 # TODO: Save job ids with Job request body to track failed jobs if any!
 
 
-# ### Submit Weather (forecast) jobs
-# Similar to historical weather data, we need weather forecast data. Submit the jobs for each boundary using weather.begin_create_data_ingestion_job and provide extension_api_name as according to weather provider  (E.g., DTN ClearAg, the extension api name for forecast data is 'dailyforecast')
+# ### Submit Weather (forecast) jobs
+# Similar to historical weather data, we need weather forecast data for model training. Submit the jobs for each boundary using weather.begin_create_data_ingestion_job and provide extension_api_name as according to weather provider  (e.g., DTN ClearAg, the extension api name for forecast data is 'dailyforecast')
 
 # In[ ]:
 
@@ -332,7 +335,7 @@ for i, boundary_obj in enumerate(boundary_objs):
     weather_forecast_jobs.append(weather_job)
 
 
-# ### Check status of Weather (forecast) jobs
+# ### Check Status of Weather (forecast) jobs
 
 # In[ ]:
 
@@ -348,10 +351,10 @@ for wth_job in weather_forecast_jobs:
 # TODO: Save job ids with Job request body to track failed jobs if any!
 
 
-# ### Download Satellite Data to Local
-# 
-# Once the data has been ingested to Azure Farmbeats, it can be downloaded to you local compute or AML compute or Data Science VM.
-# The data gets downloaded using scenes download method. This would dependent on network bandwidth of your compute.
+# ### Download Satellite Data to Compute
+# 
+# Once the data has been ingested to Azure Farmbeats PaaS, it can be downloaded to your local machine or AML compute or Data Science VM.
+# The data gets downloaded using scenes download method. This would be dependent on network bandwidth of your compute.
 
 # In[ ]:
 
@@ -365,9 +368,9 @@ IOUtil.create_dir_safely(CONSTANTS["results_dir"])
 df.to_csv(os.path.join(CONSTANTS["results_dir"], "satellite_paths.csv"), index=None)
 
 
-# ### Download Weather Data (Historical) to Local
-# 
-# We query the weather data from Azure Farmbeats and the resposne is list of json object. This gets conveted into pandas dataframes (The typical data format for ML model inputs) and saved to your compute.
+# ### Download Weather Data (Historical) to Compute
+# 
+# We query the weather data from Azure Farmbeats and the resposne is list of json object. This gets conveted into pandas dataframe (The typical data format for ML model inputs) and saved to your compute.
 
 # In[ ]:
 
@@ -390,7 +393,8 @@ for boundary_obj in boundary_objs:
 print('Downloaded weather (historical) data!!')
 
 
-# ### Download Weather Data (Forecast) to Local
+# ### Download Weather Data (Forecast) to Compute
+# Similar to historical weather data, we query forecast data and save it to csv files. 
 
 # In[ ]:
 

@@ -5,9 +5,10 @@
 # 
 # Licensed under the MIT License.
 
-# # Train EVI Forecast
+# # Train EVI Forecast Model
+# In this notebook, EVI forecast model is built using satellite and weather (historical and forecast) data on dataset (curated locations spread across USA from Crop Data Layer), which predicts EVI for next 10 days in advance for an Area of Interest (AOI). This notebook runs on the data downloaded from 1_download_data.ipynb notebook. 
 
-# ### Import libraries
+# ### Import Libraries
 
 # In[ ]:
 
@@ -146,7 +147,7 @@ w_stats = pd.concat(
 )[weather_parms].agg({"mean", "std"})
 
 
-# ### Get weather statistics for Normalization
+# ### Get Weather Statistics for Normalization
 
 # In[ ]:
 
@@ -203,7 +204,7 @@ def get_ARD(boundaryId):
     )
 
 
-# ### Create Analysis Ready Dataset
+# ### Create Analysis Ready Dataset (ARD)
 
 # In[ ]:
 
@@ -341,7 +342,7 @@ tf.keras.models.save_model(
 )
 
 
-# ### Visualization
+# ### Visualization of Model Results on Validation Dataset
 
 # In[ ]:
 

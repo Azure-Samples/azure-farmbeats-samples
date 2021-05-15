@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# # Deploy Model to Azure ML
+# # Deploying Model using Azure Machie Learning SDK
+# 
+# In this notebook, we demonstrate how to deploy the model that has been generated from notebook, 2_train.ipynb. It creates a web service endpoint, which can be used for inference (Forecasting EVI) on any Area of Interest (AOI). 
 
-# In[1]:
+# ### Import Libraries
+
+# In[ ]:
 
 
 # System Imports
 import glob
 import os
 import pickle
-
-# Local Imports
-from utils.constants import CONSTANTS
 
 # Azure Imports
 from azureml.core import Workspace
@@ -22,19 +23,20 @@ from azureml.core.conda_dependencies import CondaDependencies
 from azureml.core.environment import Environment
 from azureml.core.model import InferenceConfig, Model
 from azureml.core.webservice import AksWebservice
+from azureml.core import Webservice
 
 
-# #### Import Workspace Config
+# ### Import Workspace Config
 
-# In[2]:
+# In[ ]:
 
 
 ws = Workspace.from_config(path=os.path.join('utils', 'ws_config.json'))
 
 
-# #### Register Model
+# ### Register Model
 
-# In[3]:
+# In[ ]:
 
 
 model = Model.register(
@@ -45,15 +47,15 @@ model = Model.register(
 )
 
 
-# In[4]:
+# In[ ]:
 
 
 model = Model(name="NDVI_forecast_model", workspace=ws)
 
 
-# #### Create Environment
+# ### Create Environment
 
-# In[5]:
+# In[ ]:
 
 
 py_version = "3.6.9"
@@ -96,9 +98,9 @@ for x in pip_reqs + [whl_url]:
 myenv.python.conda_dependencies = conda_dep
 
 
-# #### Create AKS 
+# ### Create Azure Kubernetes Service (AKS)
 
-# In[6]:
+# In[ ]:
 
 
 # Adding Scoring file
@@ -118,9 +120,9 @@ except ComputeTargetException:
     aks_target.wait_for_completion(show_output=True)
 
 
-# #### Deploy
+# ### Deploy Model
 
-# In[7]:
+# In[ ]:
 
 
 # deployment configuration of pods
@@ -144,28 +146,28 @@ service = Model.deploy(
 service.wait_for_deployment(True)
 
 
-# In[8]:
+# In[ ]:
 
 
 service.get_logs()
 
 
-# In[9]:
+# In[ ]:
 
 
 print(ws.webservices)
 
 
-# In[10]:
+# In[ ]:
 
-
-from azureml.core import Webservice
 
 service = Webservice(ws, 'ndviforecastservice')
 print(service.get_logs())
 
 
-# In[11]:
+# ### Save Webservice Endpoint and Token
+
+# In[ ]:
 
 
 print(service.state)
