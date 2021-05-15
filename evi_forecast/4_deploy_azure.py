@@ -3,7 +3,7 @@
 
 # # Deploy Model to Azure ML
 
-# In[ ]:
+# In[1]:
 
 
 # System Imports
@@ -26,7 +26,7 @@ from azureml.core.webservice import AksWebservice
 
 # #### Import Workspace Config
 
-# In[ ]:
+# In[2]:
 
 
 ws = Workspace.from_config(path=os.path.join('utils', 'ws_config.json'))
@@ -34,7 +34,7 @@ ws = Workspace.from_config(path=os.path.join('utils', 'ws_config.json'))
 
 # #### Register Model
 
-# In[ ]:
+# In[3]:
 
 
 model = Model.register(
@@ -45,7 +45,7 @@ model = Model.register(
 )
 
 
-# In[ ]:
+# In[4]:
 
 
 model = Model(name="NDVI_forecast_model", workspace=ws)
@@ -53,7 +53,7 @@ model = Model(name="NDVI_forecast_model", workspace=ws)
 
 # #### Create Environment
 
-# In[ ]:
+# In[5]:
 
 
 py_version = "3.6.9"
@@ -98,7 +98,7 @@ myenv.python.conda_dependencies = conda_dep
 
 # #### Create AKS 
 
-# In[ ]:
+# In[6]:
 
 
 # Adding Scoring file
@@ -106,7 +106,7 @@ inference_config = InferenceConfig(
     entry_script="scoring_file.py", source_directory=".//utils", environment=myenv
 )
 
-AKS_NAME = 'annareshaks1'
+AKS_NAME = 'myaks1'
 # Create the AKS cluster if not available
 try:
     aks_target = ComputeTarget(workspace=ws, name=AKS_NAME)
@@ -120,7 +120,7 @@ except ComputeTargetException:
 
 # #### Deploy
 
-# In[ ]:
+# In[7]:
 
 
 # deployment configuration of pods
@@ -144,19 +144,19 @@ service = Model.deploy(
 service.wait_for_deployment(True)
 
 
-# In[ ]:
+# In[8]:
 
 
 service.get_logs()
 
 
-# In[ ]:
+# In[9]:
 
 
 print(ws.webservices)
 
 
-# In[ ]:
+# In[10]:
 
 
 from azureml.core import Webservice
@@ -165,7 +165,7 @@ service = Webservice(ws, 'ndviforecastservice')
 print(service.get_logs())
 
 
-# In[ ]:
+# In[11]:
 
 
 print(service.state)

@@ -21,6 +21,12 @@
 # In[ ]:
 
 
+get_ipython().system('pip install -r ../requirements-modelsamples.txt')
+
+
+# In[ ]:
+
+
 # Standard library imports
 import json
 import os
@@ -180,7 +186,7 @@ end_dt = datetime.strptime(CONSTANTS["interp_date_end"], "%d-%m-%Y")
 
 satellite_jobs = []
 for i, boundary_obj in enumerate(boundary_objs):
-    job_id = "satellitejob"+ str(i) + str(RUN_ID)
+    job_id = "s-job"+ str(i) + str(RUN_ID)
     
     # Submit Satellite Job
     try:
@@ -249,7 +255,7 @@ extension_api_name = "dailyhistorical"
 
 weather_jobs = []
 for i, boundary_obj in enumerate(boundary_objs):
-    job_id = "w-historical" + str(i) + str(RUN_ID)
+    job_id = "w-hist" + str(i) + str(RUN_ID)
     st_unix = int(start_dt.timestamp())
     ed_unix = int(end_dt.timestamp())
     try:
@@ -302,7 +308,7 @@ START = 0
 END = 10
 extension_api_name = "dailyforecast"
 for i, boundary_obj in enumerate(boundary_objs):
-    job_id = "w-forecast"+ str(i) + str(RUN_ID)
+    job_id = "w-fcast"+ str(i) + str(RUN_ID)
     
     try:
         print("Queuing weather job... ", end="", flush=True)

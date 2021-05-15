@@ -7,7 +7,7 @@
 
 # # Test EVI Forecast (local)
 
-# In[ ]:
+# In[1]:
 
 
 # Stanadard library imports
@@ -48,7 +48,7 @@ from azure.farmbeats import FarmBeatsClient
 
 # ### Farmbeats Configuration
 
-# In[ ]:
+# In[2]:
 
 
 # FarmBeats Client definition
@@ -73,19 +73,19 @@ fb_client = FarmBeatsClient(
 
 # #### Satellie Data
 
-# In[ ]:
+# In[3]:
 
 
 farmer_id = "contoso_farmer"
-boundary_id = "sample-boundary-2" # TODO: Check later for geometry also
-bonudary_geometry = '[[79.2900037765503,18.001060134232404],[79.30253505706787,18.001060134232404],[79.30253505706787,18.01522225664995],[79.2900037765503,18.01522225664995],[79.2900037765503, 18.001060134232404]]'
+boundary_id = "sample-boundary-32" # TODO: Check later for geometry also
+bonudary_geometry = '[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]'
 
 #TODO: Check if end_dt is not less than current date
 end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
 start_dt = end_dt - timedelta(days=60)
 
 
-# In[ ]:
+# In[4]:
 
 
 # Create Boundary and get satelite and weather (historical and forecast)
@@ -103,13 +103,13 @@ boundary = fb_client.boundaries.get(
         )
 
 
-# In[ ]:
+# In[5]:
 
 
 boundary.as_dict()
 
 
-# In[ ]:
+# In[6]:
 
 
 root_dir = CONSTANTS['root_dir']
@@ -126,7 +126,7 @@ start_dt_w = end_dt_w - timedelta(days=CONSTANTS["input_days"] - 1)
 
 # #### Weather Data
 
-# In[ ]:
+# In[7]:
 
 
 # get weather data historical
@@ -144,7 +144,7 @@ for w_data in weather_list:
 w_df_hist = WeatherUtil.get_weather_data_df(weather_data)
 
 
-# In[ ]:
+# In[8]:
 
 
 # get weather data forecast
@@ -163,7 +163,7 @@ for w_data in weather_list:
 w_df_forecast = WeatherUtil.get_weather_data_df(weather_data)
 
 
-# In[ ]:
+# In[9]:
 
 
 # merge weather data
@@ -175,7 +175,7 @@ with open(CONSTANTS["w_pkl"], "rb") as f:
 
 # ### Prepare ARD for test boundary
 
-# In[ ]:
+# In[10]:
 
 
 ard = ard_preprocess(
@@ -196,7 +196,7 @@ ard = ard_preprocess(
 frcst_st_dt  = end_dt_w
 
 
-# In[ ]:
+# In[11]:
 
 
 # raise exception if ARD is empty
@@ -225,7 +225,7 @@ if (
 
 # ### Load Model
 
-# In[ ]:
+# In[12]:
 
 
 # read model and weather normalization stats
@@ -234,7 +234,7 @@ model = tf.keras.models.load_model(CONSTANTS["modelh5"], compile=False)
 
 # ### Model Predictions
 
-# In[ ]:
+# In[13]:
 
 
 # model prediction
@@ -256,7 +256,7 @@ pred_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
 )
 
 
-# In[ ]:
+# In[14]:
 
 
 pred_df.head()
@@ -264,7 +264,7 @@ pred_df.head()
 
 # ### Write output to TIF files
 
-# In[ ]:
+# In[15]:
 
 
 get_ipython().run_line_magic('matplotlib', 'inline')
@@ -278,7 +278,7 @@ with rasterio.open(ref_tif) as src:
     ras_meta = src.profile
 
 
-# In[ ]:
+# In[16]:
 
 
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
@@ -289,7 +289,7 @@ for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
 
 # ### Visualize EVI Forecast Maps
 
-# In[ ]:
+# In[17]:
 
 
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude

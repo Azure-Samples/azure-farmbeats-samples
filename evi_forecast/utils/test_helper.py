@@ -144,6 +144,7 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_id, boundary_polygon, st
         raise
 
     # Wait for all 3 jobs
+    print('Waiting for all jobs to complete')
     satellite_job.result()
     weather_hist_job.result()
     weather_forecast_job.result()
