@@ -32,7 +32,7 @@ from utils.weather_util import WeatherUtil
 from azure.identity import ClientSecretCredential
 
 # SDK imports
-from azure.farmbeats import FarmBeatsClient
+from azure.agrifood.farming import FarmBeatsClient
 
 
 # -
