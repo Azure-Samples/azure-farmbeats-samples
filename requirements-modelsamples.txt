@@ -1,0 +1,11 @@
+###### Requirements with Version Specifiers ######`
+geopandas==0.7.0
+numpy
+pandas==1.0.3
+rasterio==1.1.5
+shapely==1.7.0
+xarray
+statsmodels==0.12.2
+
+# local packages
+../azure_farmbeats-0.1.0-py3-none-any.whl
