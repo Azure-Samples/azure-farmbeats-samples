@@ -1,4 +1,4 @@
-name: Link Checker
+name: PR Validations
 
 on:
   pull_request:
@@ -9,7 +9,8 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  verify:
+  check-links:
+    name: Check Links
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
