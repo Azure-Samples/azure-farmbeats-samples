@@ -14,7 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Check links in Markdown files
+        id: check-links-step
         uses: lycheeverse/lychee-action@v1.0.8
         with:
-          args: --verbose --no-progress *.md
+          args: --verbose --no-progress --github-token ${{ secrets.GITHUB_TOKEN }} *.md
+      - name: Fail for errors
+        run: exit ${{ steps.check-links-step.outputs.exit_code }}
+
 
