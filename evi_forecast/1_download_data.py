@@ -393,11 +393,3 @@ for boundary_obj in boundary_objs:
 print('Downloaded weather (forecast) data!!')
 
 
-# %%
-farmbeats_config
-
-
-# %%
-
-
-

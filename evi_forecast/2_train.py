@@ -331,7 +331,3 @@ plt.suptitle(
 plt.savefig(CONSTANTS["model_result_png"])
 
 
-# %%
-
-
-
