@@ -35,6 +35,7 @@ import os
 import sys
 import uuid
 from datetime import datetime
+import time
 
 # Disable unnecessary logs 
 import logging
@@ -235,8 +236,13 @@ extension_api_name = "dailyhistorical"
 
 # %%
 weather_jobs = []
+job_count = 0
 for i, boundary_obj in enumerate(boundary_objs):
     job_id = "w-hist" + str(i) + str(RUN_ID)
+    job_count += 1
+    if job_count%100 == 0:
+        print("job_count", job_count)
+        time.sleep(60)
     st_unix = int(start_dt.timestamp())
     ed_unix = int(end_dt.timestamp())
     try:
@@ -281,12 +287,16 @@ for wth_job in weather_jobs:
 
 # %%
 weather_forecast_jobs = []
+job_count = 0
 START = 0
 END = 10
 extension_api_name = "dailyforecast"
 for i, boundary_obj in enumerate(boundary_objs):
     job_id = "w-fcast"+ str(i) + str(RUN_ID)
-    
+    job_count += 1
+    if job_count % 100 == 0:
+        print("job_count", job_count)
+        time.sleep(60)
     try:
         print("Queuing weather job... ", end="", flush=True)
         weather_job = fb_client.weather.begin_create_data_ingestion_job(
@@ -381,6 +391,10 @@ for boundary_obj in boundary_objs:
     w_frcst_df.to_csv(os.path.join(root_dir, boundary_obj.id + "_forecast.csv"), index=False)
 
 print('Downloaded weather (forecast) data!!')
+
+
+# %%
+farmbeats_config
 
 
 # %%
