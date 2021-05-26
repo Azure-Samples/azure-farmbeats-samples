@@ -61,7 +61,7 @@ def call_farmbeats(farmbeats_config):
     credential_scopes = [farmbeats_config['default_scope']]
 
     fb_client = FarmBeatsClient(
-        base_url=farmbeats_config['instance_url'],
+        endpoint=farmbeats_config['instance_url'],
         credential=credential,
         credential_scopes=credential_scopes,
         logging_enable=True
