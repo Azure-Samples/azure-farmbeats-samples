@@ -273,7 +273,3 @@ for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
     time.sleep(1)  
 
 
-# %%
-
-
-
