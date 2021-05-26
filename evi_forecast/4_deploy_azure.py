@@ -69,7 +69,7 @@ pip_reqs = [
     "rasterio==1.1.5",
     "shapely==1.7.0",
     "xarray",
-    "statsmodels==0.12.2"
+    "statsmodels==0.12.2",
     "h5py==2.10"
 ]
 
