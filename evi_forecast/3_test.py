@@ -79,7 +79,7 @@ fb_client = FarmBeatsClient(
 # %%
 farmer_id = "contoso_farmer"
 boundary_id = "sample-boundary-32" # TODO: Check later for geometry also
-bonudary_geometry = '[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]'
+boundary_geometry = '[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]'
 
 #TODO: Check if end_dt is not less than current date
 end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
@@ -91,7 +91,7 @@ start_dt = end_dt - timedelta(days=60)
 get_sat_weather_data(fb_client, 
                 farmer_id, 
                 boundary_id,
-                json.loads(bonudary_geometry), 
+                json.loads(boundary_geometry), 
                 start_dt, 
                 end_dt)
 

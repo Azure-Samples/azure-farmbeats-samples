@@ -1,15 +1,13 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# # Deploying Model using Azure Machie Learning SDK
-# 
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+# %% [markdown]
+# # Deploying Model using Azure Machie Learning SDK
+# 
 # In this notebook, we demonstrate how to deploy the model that has been generated from notebook, 2_train.ipynb. It creates a web service endpoint, which can be used for inference (Forecasting EVI) on any Area of Interest (AOI). 
-
+# %% [markdown]
 # ### Import Libraries
 
-# In[ ]:
-
-
+# %%
 # System Imports
 import glob
 import os
@@ -25,20 +23,16 @@ from azureml.core.model import InferenceConfig, Model
 from azureml.core.webservice import AksWebservice
 from azureml.core import Webservice
 
-
+# %% [markdown]
 # ### Import Workspace Config
 
-# In[ ]:
-
-
+# %%
 ws = Workspace.from_config(path=os.path.join('utils', 'ws_config.json'))
 
-
+# %% [markdown]
 # ### Register Model
 
-# In[ ]:
-
-
+# %%
 model = Model.register(
     model_path="model",
     model_name="NDVI_forecast_model",
@@ -47,17 +41,13 @@ model = Model.register(
 )
 
 
-# In[ ]:
-
-
+# %%
 model = Model(name="NDVI_forecast_model", workspace=ws)
 
-
+# %% [markdown]
 # ### Create Environment
 
-# In[ ]:
-
-
+# %%
 py_version = "3.6.9"
 
 conda_reqs = [
@@ -80,6 +70,7 @@ pip_reqs = [
     "shapely==1.7.0",
     "xarray",
     "statsmodels==0.12.2"
+    "h5py==2.10"
 ]
 
 myenv = Environment(name="myenv")
@@ -97,12 +88,10 @@ for x in pip_reqs + [whl_url]:
 
 myenv.python.conda_dependencies = conda_dep
 
-
+# %% [markdown]
 # ### Create Azure Kubernetes Service (AKS)
 
-# In[ ]:
-
-
+# %%
 # Adding Scoring file
 inference_config = InferenceConfig(
     entry_script="scoring_file.py", source_directory=".//utils", environment=myenv
@@ -119,12 +108,10 @@ except ComputeTargetException:
     )
     aks_target.wait_for_completion(show_output=True)
 
-
+# %% [markdown]
 # ### Deploy Model
 
-# In[ ]:
-
-
+# %%
 # deployment configuration of pods
 deployment_config = AksWebservice.deploy_configuration(
     cpu_cores=1,
@@ -146,30 +133,22 @@ service = Model.deploy(
 service.wait_for_deployment(True)
 
 
-# In[ ]:
-
-
+# %%
 service.get_logs()
 
 
-# In[ ]:
-
-
+# %%
 print(ws.webservices)
 
 
-# In[ ]:
-
-
+# %%
 service = Webservice(ws, 'ndviforecastservice')
 print(service.get_logs())
 
-
+# %% [markdown]
 # ### Save Webservice Endpoint and Token
 
-# In[ ]:
-
-
+# %%
 print(service.state)
 print("scoring URI: " + service.scoring_uri)
 token, refresh_by = service.get_token()
@@ -177,4 +156,5 @@ print(token)
 
 with open("results//service_uri.pkl", "wb") as f:
     pickle.dump([service.scoring_uri, token], f)
+
 

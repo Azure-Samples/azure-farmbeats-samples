@@ -6,6 +6,7 @@ rasterio==1.1.5
 shapely==1.7.0
 xarray
 statsmodels==0.12.2
+h5py==2.10
 
 # local packages
 ../azure_agrifood_farming-1.0.0a20210521001-py2.py3-none-any.whl
