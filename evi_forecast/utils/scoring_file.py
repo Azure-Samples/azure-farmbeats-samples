@@ -213,7 +213,7 @@ def run(data):
         )
 
         # Prepare result and return output
-        result = {'ref_tif': ref_tif, 'model_preds': tmp_df.to_dict()}
+        result = {'ref_tif': str(ref_tif), 'model_preds': tmp_df.to_dict()}
         return result
     
     except Exception as e:
