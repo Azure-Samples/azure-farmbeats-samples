@@ -45,7 +45,8 @@ def init():
     global weather_std
     # read model and weather normalization stats
     model_path = os.getenv("AZUREML_MODEL_DIR") + "/"
-    model = tf.keras.models.load_model(model_path + CONSTANTS["modelh5"], compile=False)
+    # For deploying pretrained model, use CONSTANTS["model_pretrained"]
+    model = tf.keras.models.load_model(model_path + CONSTANTS["model_trained"], compile=False)
     with open(model_path + CONSTANTS["w_pkl"], "rb") as f:
         w_parms, weather_mean, weather_std = pickle.load(f)
 

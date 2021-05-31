@@ -306,7 +306,7 @@ training_history = model.fit(
 val_pred = model.predict(X_val)
 # Save model to h5 format
 tf.keras.models.save_model(
-    model, filepath= CONSTANTS["modelh5"], save_format="h5", overwrite=True
+    model, filepath= CONSTANTS["model_trained"], save_format="h5", overwrite=True
 )
 
 # %% [markdown]

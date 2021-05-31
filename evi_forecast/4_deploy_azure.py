@@ -70,8 +70,7 @@ pip_reqs = [
     "shapely==1.7.0",
     "xarray",
     "statsmodels==0.12.2",
-    "h5py==2.10",
-    "azure_agrifood_farming==1.0.0b1",
+    "h5py==2.10"
 ]
 
 myenv = Environment(name="myenv")
@@ -91,11 +90,14 @@ myenv.python.conda_dependencies = conda_dep
 
 # %%
 # Adding Scoring file
+# This code deploy model trained in train.ipynb (CONSTANTS["model_trained"]) by default.
+# For deploying pretrained model, change the model name (CONSTANTS["model_pretrained"]) 
+# in utils/scoring_file.py (Line #49). Pre-trained model is already persisted in model folder.
 inference_config = InferenceConfig(
     entry_script="scoring_file.py", source_directory=".//utils", environment=myenv
 )
 
-AKS_NAME = 'myaks1'
+AKS_NAME = 'myaks'
 # Create the AKS cluster if not available
 try:
     aks_target = ComputeTarget(workspace=ws, name=AKS_NAME)

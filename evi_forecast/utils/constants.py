@@ -22,7 +22,8 @@ CONSTANTS= {
     "results_dir": "results/",
     "ardpkl": "results/ARD_18mar2021.pkl",  # Analysis ready dataset pickle file
     "w_pkl": "model/weather_parms_18mar2021.pkl",  # training data weather parameters list and sttaistics
-    "modelh5": "model/model_100_100_100_18mar2021.h5",  # trained model in h5 format
+    "model_trained": "model/model_trained.h5",  # trained model in h5 format
+    "model_pretrained": "model/model_pretrained.h5",  # pre-trained model in h5 format
     "model_result_png": "results/ANN_results_100_100_100_18mar2021.png",  # validation error results
     "var_name": "ndvi",
 }
