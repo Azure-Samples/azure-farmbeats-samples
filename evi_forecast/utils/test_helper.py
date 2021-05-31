@@ -15,7 +15,7 @@ import pandas as pd
 from utils.config import farmbeats_config
 
 # Library specific imports
-from azure.core.exceptions import HttpResponseError
+from azure.core.exceptions import HttpResponseError, ResourceNotFoundError
 from azure.agrifood.farming import FarmBeatsClient
 from azure.agrifood.farming.models import (Farmer, Boundary, Polygon,
                                     SatelliteDataIngestionJob,
