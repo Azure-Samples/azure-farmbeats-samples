@@ -96,19 +96,29 @@ with rasterio.open(ref_tif) as src:
 
 # %%
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
-    data_array = np.array(pred_df[coln].astype('float32')).reshape(src.shape)
-    with rasterio.open(os.path.join(output_dir, coln + '.tif'), 'w', **ras_meta) as dst:
-        dst.write(data_array, indexes=1)
+    try:   
+        file_name = os.path.join(output_dir, coln + '.tif')
+        if os.path.exists(file_name):
+            os.remove(file_name)
+        data_array = np.array(pred_df[coln].astype('float32')).reshape(src.shape)
+        with rasterio.open(file_name, 'w', **ras_meta) as dst:
+            dst.write(data_array, indexes=1)
+    except Exception as e:
+        print(e)
 
 # %% [markdown]
 # ### Visualize EVI Forecast Maps
 
 # %%
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
-    src = rasterio.open(os.path.join(output_dir, coln + '.tif'))
-    show(src.read(), transform=src.transform, title=coln)
-    #show_hist(src)
-    display.clear_output(wait=True)
-    time.sleep(1) 
+    try:
+        file_name = os.path.join(output_dir, coln + '.tif')
+        src = rasterio.open(file_name)
+        show(src.read(), transform=src.transform, title=coln)
+        #show_hist(src)
+        display.clear_output(wait=True)
+        time.sleep(1) 
+    except Exception as e:
+        print(e)
 
 
