@@ -1,6 +1,9 @@
 # To add a new cell, type '# %%'
 # To add a new markdown cell, type '# %% [markdown]'
 # %% [markdown]
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+# %% [markdown]
 # # Deploying Model using Azure Machie Learning SDK
 # 
 # In this notebook, we demonstrate how to deploy the model that has been generated from notebook, 2_train.ipynb. It creates a web service endpoint, which can be used for inference (Forecasting EVI) on any Area of Interest (AOI). 

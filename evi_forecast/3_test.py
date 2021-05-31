@@ -5,7 +5,6 @@ from IPython import get_ipython
 
 # %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
-# 
 # Licensed under the MIT License.
 # %% [markdown]
 # # EVI Forecast on Area of Interest (AOI)

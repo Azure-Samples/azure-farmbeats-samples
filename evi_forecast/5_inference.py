@@ -4,11 +4,10 @@
 from IPython import get_ipython
 
 # %% [markdown]
-# # Inference: EVI Forecast on Area of Interest using ML Webservice
-# %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
-# 
 # Licensed under the MIT License.
+# %% [markdown]
+# # Inference: EVI Forecast on Area of Interest using ML Webservice
 # %% [markdown]
 # ### Import libraries
 

@@ -1,4 +1,6 @@
-# +
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 # Stanadard library imports
 import json
 import pickle
