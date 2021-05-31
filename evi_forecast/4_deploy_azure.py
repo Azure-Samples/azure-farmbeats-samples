@@ -70,20 +70,18 @@ pip_reqs = [
     "shapely==1.7.0",
     "xarray",
     "statsmodels==0.12.2",
-    "h5py==2.10"
+    "h5py==2.10",
+    "azure_agrifood_farming==1.0.0b1",
 ]
 
 myenv = Environment(name="myenv")
 conda_dep = CondaDependencies()
 conda_dep.set_python_version(py_version)
 conda_dep.add_channel("conda-forge")
-whl_url = Environment.add_private_pip_wheel(
-    workspace=ws, file_path=glob.glob("..//*.whl")[0], exist_ok=True
-)
 for x in conda_reqs:
     conda_dep.add_conda_package(x)
 
-for x in pip_reqs + [whl_url]:
+for x in pip_reqs:
     conda_dep.add_pip_package(x)
 
 myenv.python.conda_dependencies = conda_dep
