@@ -212,7 +212,7 @@ if (
 
 # %%
 # read model and weather normalization stats
-model = tf.keras.models.load_model(CONSTANTS["modelh5"], compile=False)
+model = tf.keras.models.load_model(CONSTANTS["model_trained"], compile=False)
 
 # %% [markdown]
 # ### Model Predictions
