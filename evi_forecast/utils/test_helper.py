@@ -27,9 +27,10 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_id, boundary_polygon, st
 
     # Create Farmer
     farmer = fb_client.farmers.get(farmer_id=farmer_id)
-    if farmer is not None:
+    try:
+        farmer = fb_client.farmers.get(farmer_id=farmer_id)
         print("Farmer {} Exists.".format(farmer_id))
-    else:
+    except ResourceNotFoundError:        
         print("Farmer doesn't exist...Creating ... ", end="", flush=True)
         farmer = fb_client.farmers.create_or_update(
             farmer_id=farmer_id,
