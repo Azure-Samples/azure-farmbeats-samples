@@ -71,7 +71,7 @@ pip_reqs = [
     "xarray",
     "statsmodels==0.12.2",
     "h5py==2.10",
-    "azure_agrifood_farming==1.0.0b1"
+    "azure_agrifood_farming==1.0.0b1",
 ]
 
 myenv = Environment(name="myenv")

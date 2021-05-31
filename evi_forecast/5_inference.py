@@ -38,13 +38,18 @@ Open service uri and token for https endpoint
 with open("results//service_uri.pkl", "rb") as f:
     scoring_uri, token = pickle.load(f)
 
+
+# %%
+scoring_uri = 'http://40.88.249.55:80/api/v1/service/ndviforecastservice/score'
+token = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjY3MzJGREYzMEIwREU4NjMzREI5QTFBMkFBQTFBMzFGNjE4QjJCNTAiLCJ0eXAiOiJKV1QifQ.eyJjYW5SZWZyZXNoIjoiRmFsc2UiLCJ3b3Jrc3BhY2VJZCI6IjRlZWFkNmE0LWUzMjktNGNmNi1hM2EwLTllOGJhMGRhNmZhYSIsInRpZCI6IjcyZjk4OGJmLTg2ZjEtNDFhZi05MWFiLTJkN2NkMDExZGI0NyIsIm9pZCI6ImQxZDJhNjNlLWJlNzMtNDVkMS1hNTVlLTljNGFmNjY3MmYxNiIsImFjdGlvbnMiOiJbXCJNaWNyb3NvZnQuTWFjaGluZUxlYXJuaW5nU2VydmljZXMvd29ya3NwYWNlcy9yZWFkXCIsXCJNaWNyb3NvZnQuTWFjaGluZUxlYXJuaW5nU2VydmljZXMvd29ya3NwYWNlcy9zZXJ2aWNlcy9ha3Mvc2NvcmUvYWN0aW9uXCJdIiwic2VydmljZUlkIjoibmR2aWZvcmVjYXN0c2VydmljZSIsImV4cCI6MTYyMjU0MDM1MSwiaXNzIjoiYXp1cmVtbCIsImF1ZCI6ImF6dXJlbWwifQ.KHadO-PsMOZsZ14tsFPIxp_tlrlJtibrChqRF1A1JF8dVQzv9MygJaVlFQ7vrq3UNFQjsTNw0RqNatDbQZkWmC9eqlMHPt_r-CiGq2zyKKKaEl2ggz7ymOxCWKnVfhtAr3ixxorm96G45PXreXsCgTAdUpSZ26sRmvnUJZoAE5PTnp4p0AP6U3FKmwDT8DzpVrQ6oeQmJU1PWUO0FSJl8dROqjiw_OvoK2jzXvBHghTd4-vFEHyRYrBoRaES8E09XDbEVbbF4ElOtfj8jJoz1OYoFhbSIQkzZpKsp0aQMGSZv7_5_xU7QDa-Td68wGQdX4wVXqJO-pZl8UqnC14zBg'
+
 # %% [markdown]
 # ### Area of Interest (AOI) for inference
 
 # %%
 farmer_id = "contoso_farmer"
-boundary_id = "sample-boundary-2" # TODO: Check later for geometry also
-bonudary_geometry = "[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]"
+boundary_id = "sample-boundary-32" # TODO: Check later for geometry also
+boundary_geometry = "[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]"
 
 # %% [markdown]
 # ### Send Request to WebService
@@ -57,7 +62,7 @@ test_data = json.dumps(
         "config": farmbeats_config,
         "farmer_id": farmer_id,
         "boundary_id": boundary_id,
-        "bonudary_geometry": json.loads(bonudary_geometry)
+        "bonudary_geometry": json.loads(boundary_geometry)
     }
 )
 response = requests.post(
