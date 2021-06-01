@@ -5,6 +5,7 @@ from IPython import get_ipython
 
 # %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
+# 
 # Licensed under the MIT License.
 # %% [markdown]
 # # EVI Forecast on Area of Interest (AOI)
@@ -237,7 +238,7 @@ pred_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
 
 
 # %%
-pred_df.head()
+pred_df.dropna().head()
 
 # %% [markdown]
 # ### Write Output to TIF files

@@ -5,6 +5,7 @@ from IPython import get_ipython
 
 # %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
+# 
 # Licensed under the MIT License.
 # %% [markdown]
 # # Inference: EVI Forecast on Area of Interest using ML Webservice
@@ -42,7 +43,7 @@ with open("results//service_uri.pkl", "rb") as f:
 
 # %%
 farmer_id = "contoso_farmer"
-boundary_id = "sample-boundary-32" # TODO: Check later for geometry also
+boundary_id = "sample-boundary-32" 
 boundary_geometry = "[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]"
 
 # %% [markdown]
@@ -75,7 +76,7 @@ print(response.elapsed)
 
 # %%
 pred_df = pd.DataFrame.from_dict(json.loads(response.content)['model_preds'])
-print(pred_df.head())
+pred_df.dropna().head()
 
 # %% [markdown]
 # ### Write Output to TIF Files
