@@ -26,7 +26,6 @@ from azure.agrifood.farming.models import (Farmer, Boundary, Polygon,
 def get_sat_weather_data(fb_client, farmer_id, boundary_id, boundary_polygon, start_dt, end_dt):
 
     # Create Farmer
-    farmer = fb_client.farmers.get(farmer_id=farmer_id)
     try:
         farmer = fb_client.farmers.get(farmer_id=farmer_id)
         print("Farmer {} Exists.".format(farmer_id))
