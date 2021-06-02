@@ -1,0 +1,25 @@
+name: PR Validations
+
+on:
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  check-links:
+    name: Check Links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Check links in Markdown files
+        id: check-links-step
+        uses: lycheeverse/lychee-action@v1.0.8
+        with:
+          args: --verbose --no-progress --github-token ${{ secrets.GITHUB_TOKEN }} *.md
+      - name: Fail for errors
+        run: exit ${{ steps.check-links-step.outputs.exit_code }}
+
+
