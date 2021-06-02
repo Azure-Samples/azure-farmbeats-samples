@@ -2,6 +2,7 @@
 # To add a new markdown cell, type '# %% [markdown]'
 # %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
+# 
 # Licensed under the MIT License.
 # %% [markdown]
 # # Deploying Model using Azure Machie Learning SDK
@@ -95,8 +96,8 @@ myenv.python.conda_dependencies = conda_dep
 # %%
 # Adding Scoring file
 # This code deploy model trained in train.ipynb (CONSTANTS["model_trained"]) by default.
-# For deploying pretrained model, change the model name (CONSTANTS["model_pretrained"]) 
-# in utils/scoring_file.py (Line #49). Pre-trained model is already persisted in model folder.
+# For deploying pretrained model, change "deploy_pretrained" to True in constants.py (Line #22) 
+# Pre-trained model is already persisted in model folder.
 inference_config = InferenceConfig(
     entry_script="scoring_file.py", source_directory=".//utils", environment=myenv
 )
