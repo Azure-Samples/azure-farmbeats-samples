@@ -1,19 +1,20 @@
-#!/usr/bin/env python
-# coding: utf-8
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+# %%
+from IPython import get_ipython
 
+# %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # 
 # Licensed under the MIT License.
-
-# # EVI Forecast on Area of Interest (AOI)
-# This notebook demonstrates, how to load the model which has been trained using previous notebook, 2_train.ipynb and forecast EVI for next 10 days on new Area of Interest.
+# %% [markdown]
+# # EVI Forecast on Area of Interest (AOI)
+# This notebook demonstrates, how to load the model which has been trained using previous notebook, 2_train.ipynb and forecast EVI for next 10 days on new Area of Interest.
 # 
-
+# %% [markdown]
 # ### Import Libraries
 
-# In[ ]:
-
-
+# %%
 # Stanadard library imports
 import json
 import pickle
@@ -47,14 +48,12 @@ from utils.weather_util import WeatherUtil
 from azure.identity import ClientSecretCredential
 
 # SDK imports
-from azure.farmbeats import FarmBeatsClient
+from azure.agrifood.farming import FarmBeatsClient
 
-
+# %% [markdown]
 # ### Farmbeats Configuration
 
-# In[ ]:
-
-
+# %%
 # FarmBeats Client definition
 credential = ClientSecretCredential(
     tenant_id=farmbeats_config['tenant_id'],
@@ -66,37 +65,33 @@ credential = ClientSecretCredential(
 credential_scopes = [farmbeats_config['default_scope']]
 
 fb_client = FarmBeatsClient(
-    base_url=farmbeats_config['instance_url'],
+    endpoint=farmbeats_config['instance_url'],
     credential=credential,
     credential_scopes=credential_scopes,
     logging_enable=True
 )
 
-
+# %% [markdown]
 # ### Forecast EVI for new AOI
-
+# %% [markdown]
 # #### Satellie Data
 
-# In[ ]:
-
-
+# %%
 farmer_id = "contoso_farmer"
 boundary_id = "sample-boundary-32" # TODO: Check later for geometry also
-bonudary_geometry = '[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]'
+boundary_geometry = '[[-121.5283155441284,38.16172478418468],[-121.51544094085693,38.16172478418468],[-121.51544094085693,38.16791636919515],[-121.5283155441284,38.16791636919515],[-121.5283155441284,38.16172478418468]]'
 
 #TODO: Check if end_dt is not less than current date
 end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
 start_dt = end_dt - timedelta(days=60)
 
 
-# In[ ]:
-
-
+# %%
 # Create Boundary and get satelite and weather (historical and forecast)
 get_sat_weather_data(fb_client, 
                 farmer_id, 
                 boundary_id,
-                json.loads(bonudary_geometry), 
+                json.loads(boundary_geometry), 
                 start_dt, 
                 end_dt)
 
@@ -107,15 +102,11 @@ boundary = fb_client.boundaries.get(
         )
 
 
-# In[ ]:
-
-
+# %%
 boundary.as_dict()
 
 
-# In[ ]:
-
-
+# %%
 root_dir = CONSTANTS['root_dir']
 
 sat_links = SatelliteUtil(farmbeats_client = fb_client).download_and_get_sat_file_paths(farmer_id, [boundary], start_dt, end_dt, root_dir)
@@ -127,12 +118,10 @@ end_dt_w = datetime.strptime(
 # calculate 30 days from last satellite available date
 start_dt_w = end_dt_w - timedelta(days=CONSTANTS["input_days"] - 1)
 
-
+# %% [markdown]
 # #### Weather Data
 
-# In[ ]:
-
-
+# %%
 # get weather data historical
 weather_list = fb_client.weather.list(
             farmer_id=  boundary.farmer_id,
@@ -148,9 +137,7 @@ for w_data in weather_list:
 w_df_hist = WeatherUtil.get_weather_data_df(weather_data)
 
 
-# In[ ]:
-
-
+# %%
 # get weather data forecast
 weather_list = fb_client.weather.list(
             farmer_id=  boundary.farmer_id,
@@ -167,21 +154,17 @@ for w_data in weather_list:
 w_df_forecast = WeatherUtil.get_weather_data_df(weather_data)
 
 
-# In[ ]:
-
-
+# %%
 # merge weather data
 weather_df = pd.concat([w_df_hist, w_df_forecast], axis=0, ignore_index=True)
 
 with open(CONSTANTS["w_pkl"], "rb") as f:
     w_parms, weather_mean, weather_std = pickle.load(f)
 
-
+# %% [markdown]
 # ### Prepare ARD for test boundary
 
-# In[ ]:
-
-
+# %%
 ard = ard_preprocess(
         sat_file_links=sat_links,
         w_df=weather_df,
@@ -200,9 +183,7 @@ ard = ard_preprocess(
 frcst_st_dt  = end_dt_w
 
 
-# In[ ]:
-
-
+# %%
 # raise exception if ARD is empty
 if ard.shape[0] == 0:
     raise Exception("Analysis ready dataset is empty")
@@ -226,21 +207,17 @@ if (
 ):
     print("Warning: input data outside range of (-1,1) found")
 
-
+# %% [markdown]
 # ### Load Model
 
-# In[ ]:
-
-
+# %%
 # read model and weather normalization stats
-model = tf.keras.models.load_model(CONSTANTS["modelh5"], compile=False)
+model = tf.keras.models.load_model(CONSTANTS["model_trained"], compile=False)
 
-
+# %% [markdown]
 # ### Model Predictions
 
-# In[ ]:
-
-
+# %%
 # model prediction
 label = model.predict(
     [
@@ -260,17 +237,13 @@ pred_df = pd.DataFrame(label[:, :, 0], columns=label_names).assign(
 )
 
 
-# In[ ]:
+# %%
+pred_df.dropna().head()
 
-
-pred_df.head()
-
-
+# %% [markdown]
 # ### Write Output to TIF files
 
-# In[ ]:
-
-
+# %%
 get_ipython().run_line_magic('matplotlib', 'inline')
 import time
 from IPython import display
@@ -282,24 +255,27 @@ with rasterio.open(ref_tif) as src:
     ras_meta = src.profile
 
 
-# In[ ]:
-
-
+# %%
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
-    data_array = np.array(pred_df[coln]).reshape(src.shape)
-    with rasterio.open(os.path.join(output_dir, coln + '.tif'), 'w', **ras_meta) as dst:
-        dst.write(data_array, indexes=1)
+    try:
+        data_array = np.array(pred_df[coln]).reshape(src.shape)
+        with rasterio.open(os.path.join(output_dir, coln + '.tif'), 'w', **ras_meta) as dst:
+            dst.write(data_array, indexes=1)
+    except Exception as e:
+        print(e)
 
-
+# %% [markdown]
 # ### Visualize EVI Forecast Maps
 
-# In[ ]:
-
-
+# %%
 for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
-    src = rasterio.open(os.path.join(output_dir, coln + '.tif'))
-    show(src.read(), transform=src.transform, title=coln)
-    #show_hist(src)
-    display.clear_output(wait=True)
-    time.sleep(1)  
+    try:
+        src = rasterio.open(os.path.join(output_dir, coln + '.tif'))
+        show(src.read(), transform=src.transform, title=coln)
+        #show_hist(src)
+        display.clear_output(wait=True)
+        time.sleep(1)  
+    except Exception as e:
+        print(e)
+
 

@@ -1,4 +1,6 @@
-# +
+# Copyright (c) Microsoft Corporation. All rights reserved.
+# Licensed under the MIT License.
+
 # Stanadard library imports
 import json
 import pickle
@@ -32,7 +34,7 @@ from utils.weather_util import WeatherUtil
 from azure.identity import ClientSecretCredential
 
 # SDK imports
-from azure.farmbeats import FarmBeatsClient
+from azure.agrifood.farming import FarmBeatsClient
 
 
 # -
@@ -45,7 +47,10 @@ def init():
     global weather_std
     # read model and weather normalization stats
     model_path = os.getenv("AZUREML_MODEL_DIR") + "/"
-    model = tf.keras.models.load_model(model_path + CONSTANTS["modelh5"], compile=False)
+    if CONSTANTS["deploy_pretrained"]:
+        model = tf.keras.models.load_model(model_path + CONSTANTS["model_pretrained"], compile=False)
+    else:
+        model = tf.keras.models.load_model(model_path + CONSTANTS["model_trained"], compile=False)
     with open(model_path + CONSTANTS["w_pkl"], "rb") as f:
         w_parms, weather_mean, weather_std = pickle.load(f)
 
@@ -61,7 +66,7 @@ def call_farmbeats(farmbeats_config):
     credential_scopes = [farmbeats_config['default_scope']]
 
     fb_client = FarmBeatsClient(
-        base_url=farmbeats_config['instance_url'],
+        endpoint=farmbeats_config['instance_url'],
         credential=credential,
         credential_scopes=credential_scopes,
         logging_enable=True
@@ -213,7 +218,7 @@ def run(data):
         )
 
         # Prepare result and return output
-        result = {'ref_tif': ref_tif, 'model_preds': tmp_df.to_dict()}
+        result = {'ref_tif': str(ref_tif), 'model_preds': tmp_df.to_dict()}
         return result
     
     except Exception as e:

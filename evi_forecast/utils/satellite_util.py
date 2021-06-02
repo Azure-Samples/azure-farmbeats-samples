@@ -11,8 +11,7 @@ from urllib.parse import urlparse, parse_qs
 import pandas as pd
 
 # Library specific imports
-from azure.core.exceptions import HttpResponseError
-from azure.farmbeats import FarmBeatsClient
+from azure.agrifood.farming import FarmBeatsClient
 
 
 class SatelliteUtil:

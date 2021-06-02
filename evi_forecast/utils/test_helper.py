@@ -15,9 +15,9 @@ import pandas as pd
 from utils.config import farmbeats_config
 
 # Library specific imports
-from azure.core.exceptions import HttpResponseError
-from azure.farmbeats import FarmBeatsClient
-from azure.farmbeats.models import (Farmer, Boundary, Polygon,
+from azure.core.exceptions import HttpResponseError, ResourceNotFoundError
+from azure.agrifood.farming import FarmBeatsClient
+from azure.agrifood.farming.models import (Farmer, Boundary, Polygon,
                                     SatelliteDataIngestionJob,
                                     WeatherDataIngestionJob, 
                                     SatelliteData)
@@ -26,10 +26,10 @@ from azure.farmbeats.models import (Farmer, Boundary, Polygon,
 def get_sat_weather_data(fb_client, farmer_id, boundary_id, boundary_polygon, start_dt, end_dt):
 
     # Create Farmer
-    farmer = fb_client.farmers.get(farmer_id=farmer_id)
-    if farmer is not None:
+    try:
+        farmer = fb_client.farmers.get(farmer_id=farmer_id)
         print("Farmer {} Exists.".format(farmer_id))
-    else:
+    except ResourceNotFoundError:        
         print("Farmer doesn't exist...Creating ... ", end="", flush=True)
         farmer = fb_client.farmers.create_or_update(
             farmer_id=farmer_id,
@@ -41,23 +41,23 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_id, boundary_polygon, st
             farmer_id=farmer_id,
             boundary_id=boundary_id
         )
-        if boundary is not None:
-            print(f"Boundary with id {boundary.id} Exist", end="\n")
-        else:
-            print(f"Creating boundary with id {boundary_id}... ", end="")
-            boundary = fb_client.boundaries.create_or_update(
-                farmer_id=farmer_id,
-                boundary_id=boundary_id,
-                boundary=Boundary(
-                    description="Created by SDK",
-                    geometry=Polygon(
-                        coordinates=[
-                            boundary_polygon
-                        ]
-                    )
+        print(f"Boundary with id {boundary.id} Exist", end="\n")
+        
+    except ResourceNotFoundError:
+        print(f"Creating boundary with id {boundary_id}... ", end="")
+        boundary = fb_client.boundaries.create_or_update(
+            farmer_id=farmer_id,
+            boundary_id=boundary_id,
+            boundary=Boundary(
+                description="Created by SDK",
+                geometry=Polygon(
+                    coordinates=[
+                        boundary_polygon
+                    ]
                 )
             )
-            print("Created")
+        )
+        print("Created")
     except Exception as e:
         print(e)
 

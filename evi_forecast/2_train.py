@@ -1,18 +1,15 @@
-#!/usr/bin/env python
-# coding: utf-8
-
+# To add a new cell, type '# %%'
+# To add a new markdown cell, type '# %% [markdown]'
+# %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
-# 
 # Licensed under the MIT License.
-
-# # Train EVI Forecast Model
+# %% [markdown]
+# # Train EVI Forecast Model
 # In this notebook, EVI forecast model is built using satellite and weather (historical and forecast) data on dataset (curated locations spread across USA from Crop Data Layer), which predicts EVI for next 10 days in advance for an Area of Interest (AOI). This notebook runs on the data downloaded from 1_download_data.ipynb notebook. 
-
+# %% [markdown]
 # ### Import Libraries
 
-# In[ ]:
-
-
+# %%
 # Standard library imports
 import os
 import pickle
@@ -39,32 +36,26 @@ from utils.ard_util import ard_preprocess
 from utils.satellite_util import SatelliteUtil
 from utils.weather_util import WeatherUtil
 
-
+# %% [markdown]
 # ### Get Satellite and Weatther Data
 
-# In[ ]:
-
-
+# %%
 root_dir = CONSTANTS['root_dir']
 
-
+# %% [markdown]
 # #### Load satellite data  local paths
 
-# In[ ]:
-
-
+# %%
 sat_links = pd.read_csv(os.path.join(CONSTANTS["results_dir"], "satellite_paths.csv"))
 sat_links["fileExist"] = sat_links.filePath.apply(os.path.exists)
 sat_links.head()
 
 # TODO: Check fileExist is True for all rows and raise error  
 
-
+# %% [markdown]
 # #### List of weather parameter used in model training
 
-# In[ ]:
-
-
+# %%
 weather_parms = [
     'airTempMax-F', 
     'airTempMin-F', 
@@ -92,12 +83,10 @@ weather_parms = [
     'windSpeedMin-mph'
 ]
 
-
+# %% [markdown]
 # ### Prepare Train and Validation sets
 
-# In[ ]:
-
-
+# %%
 # Combine satellite file paths and weather file per boundary
 
 trainval = (
@@ -118,9 +107,7 @@ trainval["w_exists"] = (trainval["boundaryId"] + "_historical.csv").apply(lambda
 trainval = trainval.query("w_exists")
 
 
-# In[ ]:
-
-
+# %%
 # Split data into train and validation sets in ~70% and ~30% respectively
 np.random.seed(10)
 trainval["trainval"] = np.where(
@@ -128,15 +115,11 @@ trainval["trainval"] = np.where(
 )
 
 
-# In[ ]:
-
-
+# %%
 print(trainval)
 
 
-# In[ ]:
-
-
+# %%
 # get mean and standard deviation of training data weather parameters for normalization
 w_stats = pd.concat(
     [
@@ -146,12 +129,10 @@ w_stats = pd.concat(
     axis=0,
 )[weather_parms].agg({"mean", "std"})
 
-
+# %% [markdown]
 # ### Get Weather Statistics for Normalization
 
-# In[ ]:
-
-
+# %%
 # get mean and standard deviation of training data weather parameters for normalization
 w_stats = pd.concat(
     [
@@ -171,9 +152,7 @@ with open(CONSTANTS["w_pkl"], "wb+") as f:
     pickle.dump([weather_parms, weather_mean, weather_std], f)
 
 
-# In[ ]:
-
-
+# %%
 def get_ARD(boundaryId):
     # function for preparing Analysis Ready Dataset
     # intended for use in _2_build_model.py
@@ -203,27 +182,21 @@ def get_ARD(boundaryId):
         "nan_input_evi and nan_input_w and nan_output_evi and nan_output_w and input_evi_le1 and output_evi_le1"
     )
 
-
+# %% [markdown]
 # ### Create Analysis Ready Dataset (ARD)
 
-# In[ ]:
-
-
+# %%
 # Get analysis ready dataset
 from concurrent.futures import ThreadPoolExecutor
 with ThreadPoolExecutor(max_workers=100) as executor:
     ards_fetch = [executor.submit(get_ARD, x) for x in trainval.boundaryId.values]
 
 
-# In[ ]:
-
-
+# %%
 ards_fetch[0].result() # sample model input xarray of first boundary
 
 
-# In[ ]:
-
-
+# %%
 data = pd.concat(
     [
         ards_fetch[x]
@@ -237,12 +210,10 @@ data = pd.concat(
     axis=0,
 )
 
-
+# %% [markdown]
 # ### Model Data Preparation
 
-# In[ ]:
-
-
+# %%
 data_train = data.query('trainval == "Train"')
 data_val = data.query('trainval == "Val"')
 
@@ -268,12 +239,10 @@ os.makedirs(os.path.dirname(CONSTANTS["ardpkl"]), exist_ok=True)
 with open(CONSTANTS["ardpkl"], "wb") as f:
     pickle.dump(data, f)
 
-
+# %% [markdown]
 # ### Model Architecture
 
-# In[ ]:
-
-
+# %%
 def get_model(input_weather, x, y, z):
     """
     Model architecture
@@ -316,12 +285,10 @@ def get_model(input_weather, x, y, z):
     # return the model
     return finnet
 
-
+# %% [markdown]
 # ### Model Training
 
-# In[ ]:
-
-
+# %%
 model = get_model(len(weather_parms), 100, 100, 100)
 optimizer = tf.keras.optimizers.SGD(learning_rate=0.1, momentum=0.9)
 model.compile(loss="mse", optimizer=optimizer, metrics=["mse"])
@@ -338,15 +305,13 @@ training_history = model.fit(
 val_pred = model.predict(X_val)
 # Save model to h5 format
 tf.keras.models.save_model(
-    model, filepath= CONSTANTS["modelh5"], save_format="h5", overwrite=True
+    model, filepath= CONSTANTS["model_trained"], save_format="h5", overwrite=True
 )
 
-
+# %% [markdown]
 # ### Visualization of Model Results on Validation Dataset
 
-# In[ ]:
-
-
+# %%
 # visualize model error as function of forecast days
 err_pred = Y_val[:, :, 0] - val_pred[:, :, 0]
 err_base = -Y_val[:, :, 0] + X_val[0][:, -1, 0][:, np.newaxis]
@@ -363,4 +328,5 @@ plt.suptitle(
     + str(np.round(np.sqrt(training_history.history["val_mse"][-1]), 4))
 )
 plt.savefig(CONSTANTS["model_result_png"])
+
 
