@@ -165,5 +165,5 @@ with open("results//service_uri.pkl", "wb") as f:
 
 # %% [markdown]
 # ### Next Step 
-# 5_inference.ipynb
+# please go to [5_inference.ipynb](./5_inference.ipynb)
 

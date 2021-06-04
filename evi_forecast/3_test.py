@@ -248,11 +248,20 @@ get_ipython().run_line_magic('matplotlib', 'inline')
 import time
 from IPython import display
 from rasterio.plot import show
+import shutil
 
-output_dir = "results/"
 ref_tif = sat_links.filePath.values[0]
 with rasterio.open(ref_tif) as src:
     ras_meta = src.profile
+
+time_stamp = datetime.strptime(datetime.now().strftime("%d/%m/%y %H:%M:%S"), "%d/%m/%y %H:%M:%S")
+output_dir = "results/model_output_"+str(time_stamp)+"/"
+try:
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+    os.mkdir(output_dir)
+except Exception as e:
+    print(e)
 
 
 # %%
@@ -280,5 +289,5 @@ for coln in pred_df.columns[:-2]: # Skip last 2 columns: lattiude, longitude
 
 # %% [markdown]
 # ### Next Step 
-# 4_deploy_azure.ipynb
+# please go to [4_deploy_azure.ipynb](./4_deploy_azure.ipynb)
 

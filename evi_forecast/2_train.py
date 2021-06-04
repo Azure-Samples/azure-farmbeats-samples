@@ -2,6 +2,7 @@
 # To add a new markdown cell, type '# %% [markdown]'
 # %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
+# 
 # Licensed under the MIT License.
 # %% [markdown]
 # # Train EVI Forecast Model
@@ -329,4 +330,7 @@ plt.suptitle(
 )
 plt.savefig(CONSTANTS["model_result_png"])
 
+# %% [markdown]
+# ### Next Step 
+# please go to [3_test.ipynb](./3_test.ipynb)
 
