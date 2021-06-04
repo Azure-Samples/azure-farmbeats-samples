@@ -27,7 +27,7 @@ from utils.ard_util import ard_preprocess
 from utils.config import farmbeats_config
 from utils.constants import CONSTANTS
 from utils.satellite_util import SatelliteUtil
-from utils.test_helper import get_sat_weather_data
+from utils.test_helper import get_sat_weather_data, get_timezone
 from utils.weather_util import WeatherUtil
 
 # Azure imports
@@ -74,8 +74,8 @@ def call_farmbeats(farmbeats_config):
     return fb_client
 
 def get_ARD_df_scoring(fb_client, farmer_id, boundary_id, boundary_geometry):
-    
-    end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
+    timezone = get_timezone(boundary_geometry)
+    end_dt = datetime.strptime(datetime.now(timezone).strftime("%Y-%m-%d"), "%Y-%m-%d")
     start_dt = end_dt - timedelta(days=60)
 
     # Create Boundary and get satelite and weather (historical and forecast)

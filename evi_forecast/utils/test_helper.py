@@ -7,9 +7,12 @@ from itertools import tee
 from pathlib import Path
 from urllib.parse import urlparse, parse_qs
 import uuid
+import pytz
 
 # Third party imports
 import pandas as pd
+import numpy as np
+import timezonefinder
 
 # Local imports
 from utils.config import farmbeats_config
@@ -153,3 +156,20 @@ def get_sat_weather_data(fb_client, farmer_id, boundary_id, boundary_polygon, st
     print(satellite_job.status())
     print(weather_hist_job.status())
     print(weather_forecast_job.status())
+
+def get_timezone(boundary_geometry: list):
+    """
+    Identify the time zone from boundary geometry
+    :param boundary_geometry: list of boundary geometry (longitued and latitudes)
+    :return: Timezone
+    """
+    try:
+        longitudes, latitudes = [], []
+        [(longitudes.append(x[0]), latitudes.append(x[1])) for x in boundary_geometry]
+        longitude = np.mean(longitudes)
+        latitude = np.mean(latitudes)
+        tf = timezonefinder.TimezoneFinder()
+        timezone_str = tf.certain_timezone_at(lat=latitude, lng=longitude)
+        return pytz.timezone(timezone_str)
+    except Exception:
+        return pytz.timezone('UTC')

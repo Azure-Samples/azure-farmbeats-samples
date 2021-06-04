@@ -75,6 +75,7 @@ pip_reqs = [
     "xarray",
     "statsmodels==0.12.2",
     "h5py==2.10",
+    "timezonefinder==5.2.0",
     "azure_agrifood_farming==1.0.0b1",
 ]
 
@@ -162,4 +163,7 @@ print(token)
 with open("results//service_uri.pkl", "wb") as f:
     pickle.dump([service.scoring_uri, token], f)
 
+# %% [markdown]
+# ### Next Step 
+# 5_inference.ipynb
 
