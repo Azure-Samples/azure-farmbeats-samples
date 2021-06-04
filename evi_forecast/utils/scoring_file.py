@@ -27,7 +27,7 @@ from utils.ard_util import ard_preprocess
 from utils.config import farmbeats_config
 from utils.constants import CONSTANTS
 from utils.satellite_util import SatelliteUtil
-from utils.test_helper import get_sat_weather_data
+from utils.test_helper import get_sat_weather_data, get_timezone
 from utils.weather_util import WeatherUtil
 
 # Azure imports
@@ -74,8 +74,8 @@ def call_farmbeats(farmbeats_config):
     return fb_client
 
 def get_ARD_df_scoring(fb_client, farmer_id, boundary_id, boundary_geometry):
-    
-    end_dt = datetime.strptime(datetime.now().strftime("%Y-%m-%d"), "%Y-%m-%d")
+    timezone = get_timezone(boundary_geometry)
+    end_dt = datetime.strptime(datetime.now(timezone).strftime("%Y-%m-%d"), "%Y-%m-%d")
     start_dt = end_dt - timedelta(days=60)
 
     # Create Boundary and get satelite and weather (historical and forecast)
@@ -152,7 +152,19 @@ def get_ARD_df_scoring(fb_client, farmer_id, boundary_id, boundary_geometry):
 
     frcst_st_dt  = end_dt_w
     
-    return ard, frcst_st_dt, sat_links.filePath.values[0]
+    ref_tif = sat_links.filePath.values[0]
+    with rasterio.open(ref_tif) as src:
+        ras_meta = src.profile
+     
+    ras_meta_enoded = dict(ras_meta)
+    ras_meta_enoded['crs'] = str((dict(ras_meta))['crs'])
+    right,bottom = src.transform * ( ras_meta['width'], ras_meta['height']) 
+    transform = list(ras_meta['transform'])
+    left, top = transform[2], transform[5]
+    #dst_left, dst_bottom, dst_right, dst_top, width, height
+    ras_meta_enoded['transform'] = [left, bottom, right, top, ras_meta['width'], ras_meta['height']]
+        
+    return ard, frcst_st_dt, ras_meta_enoded
 
 # Handle requests to the service
 def run(data):
@@ -172,7 +184,7 @@ def run(data):
         # prepare ARD for new data
         # frcst_st_dt reprresents last available scene of satellite
         # forecast will be done for 10 days from last available scene
-        ard, frcst_st_dt, ref_tif = get_ARD_df_scoring(
+        ard, frcst_st_dt, ras_meta = get_ARD_df_scoring(
             fb_client, 
             farmer_id,
             boundary_id, 
@@ -218,7 +230,7 @@ def run(data):
         )
 
         # Prepare result and return output
-        result = {'ref_tif': str(ref_tif), 'model_preds': tmp_df.to_dict()}
+        result = {'ras_meta': ras_meta, 'model_preds': tmp_df.to_dict()}
         return result
     
     except Exception as e:

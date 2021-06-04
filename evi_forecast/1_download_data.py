@@ -5,6 +5,7 @@ from IPython import get_ipython
 
 # %% [markdown]
 # Copyright (c) Microsoft Corporation. All rights reserved.
+# 
 # Licensed under the MIT License.
 # %% [markdown]
 # # Azure FarmBeats: Satellite and Weather Data
@@ -101,16 +102,13 @@ root_dir = CONSTANTS['root_dir']  # Satellite data gets downloaded here
 farmer_id = "contoso_farmer"
 try:
     farmer = fb_client.farmers.get(farmer_id=farmer_id)
-    if farmer is not None:
-        print("Farmer {} Exists.".format(farmer_id))
-    else:
-        print("Farmer doesn't exist...Creating ... ", end="", flush=True)
-        farmer = fb_client.farmers.create_or_update(
-            farmer_id=farmer_id,
-            farmer=Farmer()
-        )
-except Exception as e:
-    print(e)
+    print("Farmer {} Exists.".format(farmer_id))
+except ResourceNotFoundError:        
+    print("Farmer doesn't exist...Creating ... ", end="", flush=True)
+    farmer = fb_client.farmers.create_or_update(
+        farmer_id=farmer_id,
+        farmer=Farmer()
+    )
 
 # %% [markdown]
 # ### Create Boundaries
@@ -391,4 +389,7 @@ for boundary_obj in boundary_objs:
 
 print('Downloaded weather (forecast) data!!')
 
+# %% [markdown]
+# ### Next Step 
+# Once the download is completed, please go to [2_train.ipynb](./2_train.ipynb)
 
