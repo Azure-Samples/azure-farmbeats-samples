@@ -89,9 +89,11 @@ import rasterio
 from rasterio.plot import show
 import shutil
 
-ref_tif = json.loads(response.content)['ref_tif']
-with rasterio.open(ref_tif) as src:
-    ras_meta = src.profile
+ras_meta = json.loads(response.content)['ras_meta']
+ras_meta['crs'] = rasterio.crs.CRS.from_string(ras_meta['crs'])
+transform = list(ras_meta['transform'])
+ras_meta['transform']=rasterio.transform.from_bounds(transform[0], transform[1], transform[2], transform[3], transform[4],transform[5])
+  
     
 time_stamp = datetime.strptime(datetime.now().strftime("%d/%m/%y %H:%M:%S"), "%d/%m/%y %H:%M:%S")
 output_dir = "results/model_output_"+str(time_stamp)+"/"
