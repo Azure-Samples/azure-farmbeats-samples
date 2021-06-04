@@ -89,7 +89,7 @@ class SatelliteUtil:
         # For EVI and other bands, cloud mask, darkpixel mask and other resolutions, similar filtering can be performed
         df_allscenes_band = df_allscenes.query(
             'name == "'
-            + band_names[0]
+            + 'NDVI'    
             + '" and resolution == 10 and cloudCoverPercentage == 0 and darkPixelPercentage < .1'
         )
 

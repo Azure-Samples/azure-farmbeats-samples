@@ -13,6 +13,7 @@ import pytz
 import pandas as pd
 import numpy as np
 import timezonefinder
+from shapely import geometry
 
 # Local imports
 from utils.config import farmbeats_config
@@ -164,12 +165,11 @@ def get_timezone(boundary_geometry: list):
     :return: Timezone
     """
     try:
-        longitudes, latitudes = [], []
-        [(longitudes.append(x[0]), latitudes.append(x[1])) for x in boundary_geometry]
-        longitude = np.mean(longitudes)
-        latitude = np.mean(latitudes)
+        P = geometry.Polygon(boundary_geometry)
+        lng_centroid, lat_centroid = list(P.centroid.coords)[0]
         tf = timezonefinder.TimezoneFinder()
-        timezone_str = tf.certain_timezone_at(lat=latitude, lng=longitude)
+        timezone_str = tf.certain_timezone_at(lat=lat_centroid, lng=lng_centroid)
         return pytz.timezone(timezone_str)
-    except Exception:
+    except Exception as e:
+        print(e)
         return pytz.timezone('UTC')
