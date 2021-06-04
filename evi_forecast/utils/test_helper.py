@@ -171,5 +171,4 @@ def get_timezone(boundary_geometry: list):
         timezone_str = tf.certain_timezone_at(lat=lat_centroid, lng=lng_centroid)
         return pytz.timezone(timezone_str)
     except Exception as e:
-        print(e)
         return pytz.timezone('UTC')
