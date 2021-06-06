@@ -21,7 +21,6 @@ To run these samples, you must have:
 - AgriFood (FarmBeats) resource - [Install FarmBeats][install_farmbeats]
 - Azure Machine Learning (AML) Compute Resource - [Create AML Compute][aml-compute-create] (with Python 3.6)
 
-
 ## Outline
 
 These samples demonstrate the following features of Azure FarmBeats:
@@ -57,8 +56,12 @@ EVI-Forecast:
 Please refer to [CONTRIBUTING.md](CONTRIBUTING.md)
 
 <!-- LINKS -->
+[aml-compute]:https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance
+[aml-compute-create]:https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-manage-compute-instance?tabs=python#create
 [api_docs]: https://aka.ms/FarmBeatsAPIDocumentationPaaS
 [authenticate_with_token]: https://docs.microsoft.com/azure/cognitive-services/authentication?tabs=powershell#authenticate-with-an-authentication-token
+[azure-agrifood-farming]:https://pypi.org/project/azure-agrifood-farming/
+[azure-ml]:https://azure.microsoft.com/en-in/services/machine-learning/
 [azure_identity_credentials]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/identity/azure-identity#credentials
 [azure_identity_pip]: https://pypi.org/project/azure-identity/
 [azure_subscription]: https://azure.microsoft.com/free/
@@ -79,7 +82,3 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md)
 [samples]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/agrifood/azure-agrifood-farming/samples/
 [scenes]: https://aka.ms/FarmBeatsSatellitePaaSDocumentation
 [source_code]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/agrifood/azure-agrifood-farming/
-[azure-agrifood-farming]:https://pypi.org/project/azure-agrifood-farming/
-[azure-ml]:https://azure.microsoft.com/en-in/services/machine-learning/
-[aml-compute]:https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance
-[aml-compute-create]:https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-manage-compute-instance?tabs=python#create
