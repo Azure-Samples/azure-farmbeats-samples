@@ -43,13 +43,13 @@ This project aims to demonstrate following things:
 ## Getting Started
 
 
-### Steps to run samples
-1. Launch the terminal of AML compute
-2. Run the following command `git clone https://github.com/Azure-Samples/azure-farmBeats-samples`
-3. Go to `Notebooks` pane and click on folder `azure-farmbeats-samples` under your alias
-4. Select `compute` and `jupyter kernel` (AzureML(py36))
-5. Update [`utils/config.py`](evi_forecast/utils/config.py) with FarmBeats credentials 
-6. Go to folder `evi_forecast` and start with `1_download_data.ipynb`
+### Steps to run samples and build anEVO forecasting model
+1. Launch the terminal of AML compute.
+2. Run the following command `git clone https://github.com/Azure-Samples/azure-farmBeats-samples`.
+3. Go to `Notebooks` pane and click on folder `azure-farmbeats-samples` under your alias.
+4. Select `compute` and `jupyter kernel` (AzureML(py36)).
+5. Update [`utils/config.py`](evi_forecast/utils/config.py) with FarmBeats credentials.
+6. Go to folder `evi_forecast` and run the notebooks enumerated in the table above starting with `1_download_data.ipynb`.
 
 
 ## Contributing
