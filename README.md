@@ -21,12 +21,12 @@ To run these samples, you must have:
 - AgriFood (FarmBeats) resource - [Install FarmBeats][install_farmbeats]
 - Azure Machine Learning (AML) Compute Resource - [Create AML Compute][aml-compute-create] (with Python 3.6)
 
-## Outline
+## Features & use case
 
-These samples demonstrate the following features of Azure FarmBeats:
+This project demonstrate the following features of Azure FarmBeats:
 
-Introduction:
-* `sample.ipynb` notebook demonstrates a how to create a farm, boundary, satellite job and weather job. A satellite job typically ingests data from satellite data provider (e.g., Sentinel) to Azure FarmBeats PaaS for a given location and duration. Similarly, weather ingests data into Azure Farmbeats Pass system from weather data provider (e.g., DTN ClearAg, DTN Content Services)
+### Creation of farms, boundaries and ingesting satellite and weather data:
+* `sample.ipynb` notebook demonstrates how to create farm, boundary, and satellite & weather data ingestion job. A satellite job typically ingests data from satellite data provider (e.g., Sentinel) to Azure FarmBeats PaaS for a given location and duration. Similarly, weather ingests data into Azure Farmbeats Pass system from weather data provider (e.g., DTN ClearAg, DTN Content Services)
 
 EVI-Forecast:
 
