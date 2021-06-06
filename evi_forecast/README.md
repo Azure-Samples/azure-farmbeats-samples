@@ -1,5 +1,5 @@
 
-This tutorial consists of five notebooks:
+This project consists of five notebooks:
 
 | Notebook | Description |  
 | --- | --- |
