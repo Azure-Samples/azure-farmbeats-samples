@@ -23,14 +23,14 @@ To run these samples, you must have:
 
 ## Features & use case
 
-This project demonstrate the following features of Azure FarmBeats:
+This project aims to demonstrate following things:
 
-### Creation of farms, boundaries and ingesting satellite and weather data:
-* `sample.ipynb` notebook demonstrates how to create farm, boundary, and satellite & weather data ingestion job. A satellite job typically ingests data from satellite data provider (e.g., Sentinel) to Azure FarmBeats PaaS for a given location and duration. Similarly, weather ingests data into Azure Farmbeats Pass system from weather data provider (e.g., DTN ClearAg, DTN Content Services)
+### Creation of farms, boundaries and ingesting satellite & weather data:
+* `sample.ipynb` notebook demonstrates how to create farms, boundaries, and ingestion jobs for satellite and weather data. A satellite ingestion job ingests satellite data (from Sentinel-2) to Azure FarmBeats PaaS data store for a given boundary and duration. Similarly, weather job ingests data into Azure Farmbeats PaaS data store from weather data providers (example: DTN ClearAg, DTN Content Services)
 
-EVI-Forecast:
+### EVI forecasting model:
 
-* An End-to-End ML Model sample that demonstrates how to pull satellite and weather data for any number of farms using Azure FarmBeats SDK, how to create analysis ready datasets (ARD), ML model building, training and deploying ML model to Azure using [Azure Machine Learning][azure-ml].
+* An end-to-end ML model sample that demonstrates how to pull satellite and weather data for any number of farms using Azure FarmBeats SDK, how to create analysis ready datasets (ARD), ML model building, training and deploying ML model to Azure using [Azure Machine Learning][azure-ml].
 
 | Notebook | Description |  
 | --- | --- |
