@@ -58,27 +58,8 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md)
 <!-- LINKS -->
 [aml-compute]:https://docs.microsoft.com/en-us/azure/machine-learning/concept-compute-instance
 [aml-compute-create]:https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-manage-compute-instance?tabs=python#create
-[api_docs]: https://aka.ms/FarmBeatsAPIDocumentationPaaS
-[authenticate_with_token]: https://docs.microsoft.com/azure/cognitive-services/authentication?tabs=powershell#authenticate-with-an-authentication-token
 [azure-agrifood-farming]:https://pypi.org/project/azure-agrifood-farming/
 [azure-ml]:https://azure.microsoft.com/en-in/services/machine-learning/
-[azure_identity_credentials]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/identity/azure-identity#credentials
-[azure_identity_pip]: https://pypi.org/project/azure-identity/
 [azure_subscription]: https://azure.microsoft.com/free/
-[change_log]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/agrifood/azure-agrifood-farming/CHANGELOG.md
-[cla]: https://cla.microsoft.com
-[coc_contact]: mailto:opencode@microsoft.com
-[coc_faq]: https://opensource.microsoft.com/codeofconduct/faq/
-[code_of_conduct]: https://opensource.microsoft.com/codeofconduct/
-[default_azure_credential]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/identity/azure-identity#defaultazurecredential/
-[farm_hierarchy]: https://aka.ms/FarmBeatsFarmHierarchyDocs
-[farm_operations_docs]: https://aka.ms/FarmBeatsFarmOperationsDocumentation
 [install_farmbeats]: https://aka.ms/FarmBeatsInstallDocumentationPaaS
 [product_docs]: https://aka.ms/FarmBeatsProductDocumentationPaaS
-[pip]: https://pypi.org/project/pip/
-[pypi]: https://pypi.org/
-[python]: https://www.python.org/downloads/
-[python_logging]: https://docs.python.org/3.5/library/logging.html
-[samples]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/agrifood/azure-agrifood-farming/samples/
-[scenes]: https://aka.ms/FarmBeatsSatellitePaaSDocumentation
-[source_code]: https://github.com/Azure/azure-sdk-for-python/tree/master/sdk/agrifood/azure-agrifood-farming/
