@@ -28,17 +28,17 @@ This project aims to demonstrate following things:
 ### Creation of farms, boundaries and ingesting satellite & weather data:
 * `sample.ipynb` notebook demonstrates how to create farms, boundaries, and ingestion jobs for satellite and weather data. A satellite ingestion job ingests satellite data (from Sentinel-2) to Azure FarmBeats PaaS data store for a given boundary and duration. Similarly, weather job ingests data into Azure Farmbeats PaaS data store from weather data providers (example: DTN ClearAg, DTN Content Services)
 
-### EVI forecasting model:
+### Build EVI forecasting model:
 
-* An end-to-end ML model sample that demonstrates how to pull satellite and weather data for any number of farms using Azure FarmBeats SDK, how to create analysis ready datasets (ARD), ML model building, training and deploying ML model to Azure using [Azure Machine Learning][azure-ml].
+* An end to end ML model sample that demonstrates how to pull satellite and weather data for any number of farms using Azure FarmBeats SDK, how to create analysis ready datasets (ARD), ML model building, training and deploying ML model to Azure using [Azure Machine Learning][azure-ml].
 
 | Notebook | Description |  
 | --- | --- |
-| [`1_download_data.ipynb`](evi_forecast/1_download_data.ipynb) | This notebook demonstrates how to download satellite and weather data for given boundaries to build EVI forecast model.
-| [`2_train.ipynb`](evi_forecast/2_train.ipynb) | This notebook demonstrates building end to end Deep Leanring model using satellite and weather data.
-| [`3_test.ipynb`](evi_forecast/3_test.ipynb) | In this notebook, the model forecasts EVI for next 10 days on a new Area of Interest.
-| [`4_deploy_azure.ipynb`](evi_forecast/4_deploy_azure.ipynb) | This notebook demonstrates how to deploy model and create webservice using Azure ML SDK.
-| [`5_inference.ipynb`](evi_forecast/5_inference.ipynb) | This notebook demonstrates model inference on a new Area of Interest (AOI) using the AzureML webservice endpoint and generte EVI forecast for next 10 days in advance.
+| [`1_download_data.ipynb`](evi_forecast/1_download_data.ipynb) | This notebook demonstrates how to download satellite and weather data for given boundaries to build EVI forecast model.|
+| [`2_train.ipynb`](evi_forecast/2_train.ipynb) | This notebook demonstrates building end to end deep Learning model using satellite and weather data.|
+| [`3_test.ipynb`](evi_forecast/3_test.ipynb) | In this notebook, the model forecasts EVI for next 10 days for an Area of Interest (AOI).|
+| [`4_deploy_azure.ipynb`](evi_forecast/4_deploy_azure.ipynb) | This notebook demonstrates how to deploy model and create webservice using Azure ML SDK.|
+| [`5_inference.ipynb`](evi_forecast/5_inference.ipynb) | This notebook demonstrates model inference on a new AOI using the AzureML webservice endpoint and generates EVI forecast for the next 10 days.|
 
 ## Getting Started
 
