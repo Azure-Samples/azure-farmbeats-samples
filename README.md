@@ -19,6 +19,7 @@ These samples leverage [Azure FarmBeats][product_docs] and its corresponding [Py
 To run these samples, you must have:
 - Azure subscription - [Create a free account][azure_subscription]
 - AgriFood (FarmBeats) resource - [Install FarmBeats][install_farmbeats]
+- A subscription with one of the supported weather data providers for FarmBeats - [Weather Integration Docs][farmbeats-weather-docs]
 - Azure Machine Learning (AML) Compute Resource - [Create AML Compute][aml-compute-create] (with Python 3.6)
 
 ## Features & use case
@@ -61,5 +62,6 @@ Please refer to [CONTRIBUTING.md](CONTRIBUTING.md)
 [azure-agrifood-farming]:https://pypi.org/project/azure-agrifood-farming/
 [azure-ml]:https://azure.microsoft.com/en-in/services/machine-learning/
 [azure_subscription]: https://azure.microsoft.com/free/
-[install_farmbeats]: https://aka.ms/FarmBeatsInstallDocumentationPaaS
-[product_docs]: https://aka.ms/FarmBeatsProductDocumentationPaaS
+[farmbeats-weather-docs]: https://aka.ms/FarmBeatsWeatherDocs/
+[install_farmbeats]: https://aka.ms/FarmBeatsInstallDocumentationPaaS/
+[product_docs]: https://aka.ms/FarmBeatsProductDocumentationPaaS/
