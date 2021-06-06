@@ -8,7 +8,7 @@ description: "This repository contains Python samples for building ML models usi
 urlFragment: azure-FarmBeats-python-samples
 ---
 
-# Microsoft Azure FarmBeats Samples for Python 
+# Azure FarmBeats samples for Python 
 
 This project contains end to end Python samples and Jupyter notebooks which demonstrate creating farms, boundaries, ingesting satellite and weather data, and building Machine Learning (ML) models related to agricultural applications. It also contains a set of utilities for data processing.
 
