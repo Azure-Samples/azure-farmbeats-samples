@@ -12,7 +12,7 @@ urlFragment: azure-FarmBeats-python-samples
 
 This project contains end to end Python samples and Jupyter notebooks which demonstrate creating farms, boundaries, ingesting satellite and weather data, and building Machine Learning (ML) models related to agricultural applications. It also contains a set of utilities for data processing.
 
-These samples leverage [Microsoft Azure FarmBeats][product_docs] and its corresponding [Python SDK][azure-agrifood-farming] and it runs on [Azure Machine Learning Compute][aml-compute].
+These samples leverage [Azure FarmBeats][product_docs] and its corresponding [Python SDK][azure-agrifood-farming] and it runs on [Azure Machine Learning Compute][aml-compute].
 
 ## Prerequisites
 
