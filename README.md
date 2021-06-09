@@ -44,7 +44,7 @@ This project aims to demonstrate following things:
 ## Getting Started
 
 
-### Steps to run samples and build anEVO forecasting model
+### Steps to run samples and build an EVI forecasting model
 1. Launch the terminal of AML compute.
 2. Run the following command `git clone https://github.com/Azure-Samples/azure-farmBeats-samples`.
 3. Go to `Notebooks` pane and click on folder `azure-farmbeats-samples` under your alias.
