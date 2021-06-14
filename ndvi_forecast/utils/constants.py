@@ -19,7 +19,7 @@ CONSTANTS= {
     "interp_date_end": "10-05-2021",  # model iterpolation start date
     
     # deployment
-    "deploy_pretrained":False, # Change it to True for deploying pre-trained model
+    "deploy_pretrained":True, # Change it to True for deploying pre-trained model
     
     # model results filenames
     "results_dir": "results/",
