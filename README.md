@@ -20,7 +20,7 @@ To run these samples, you must have:
 - Azure subscription - [Create a free account][azure_subscription]
 - Azure FarmBeats resource - [Install FarmBeats][install_farmbeats]
 - A subscription with one of the supported weather data providers for FarmBeats - [Weather Integration Docs][farmbeats-weather-docs]
-- Azure Machine Learning (AML) Compute Resource - [Create AML Compute][aml-compute-create] (with Python 3.6)
+- Azure Machine Learning (AML) compute resource - [Create AML Compute][aml-compute-create] (with Python 3.6)
 
 ## Features & use case
 
