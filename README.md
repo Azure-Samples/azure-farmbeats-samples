@@ -27,7 +27,7 @@ To run these samples, you must have:
 This project aims to demonstrate following:
 
 ### Creation of farms, boundaries and ingesting satellite & weather data:
-* [`sample.ipynb`](quick_start/sample.ipynb) notebook demonstrates how to create farms, boundaries, and ingestion jobs for satellite and weather data. A satellite ingestion job ingests satellite data (from Sentinel-2) to Azure FarmBeats data store for a given boundary and duration. Similarly, weather job ingests data into Azure Farmbeats store from weather data providers (example: DTN ClearAg, DTN Content Services)
+* [`quick_start.ipynb`](quick_start/quick_start.ipynb) notebook demonstrates how to create farms, boundaries, and ingestion jobs for satellite and weather data. A satellite ingestion job ingests satellite data (from Sentinel-2) to Azure FarmBeats data store for a given area of interest(AOI) and duration. Similarly, weather job ingests data into Azure Farmbeats store from weather data providers (example: DTN ClearAg, DTN Content Services)
 
 ### Build NDVI forecasting model:
 
