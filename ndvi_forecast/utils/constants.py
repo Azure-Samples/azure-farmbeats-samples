@@ -19,14 +19,14 @@ CONSTANTS= {
     "interp_date_end": "10-05-2021",  # model iterpolation start date
     
     # deployment
-    "deploy_pretrained":False, # Change it to True for deploying pre-trained model
+    "deploy_pretrained":True, # Change it to True for deploying pre-trained model
     
     # model results filenames
     "results_dir": "results/",
-    "ardpkl": "results/ARD_18mar2021.pkl",  # Analysis ready dataset pickle file
-    "w_pkl": "model/weather_parms_18mar2021.pkl",  # training data weather parameters list and sttaistics
+    "ardpkl": "results/ARD.pkl",  # Analysis ready dataset pickle file
+    "w_pkl": "model/weather_parms.pkl",  # training data weather parameters list and sttaistics
     "model_trained": "model/model_trained.h5",  # trained model in h5 format
     "model_pretrained": "model/model_pretrained.h5",  # pre-trained model in h5 format
-    "model_result_png": "results/ANN_results_100_100_100_18mar2021.png",  # validation error results
+    "model_result_png": "results/ANN_results.png",  # validation error results
     "var_name": "ndvi",
 }

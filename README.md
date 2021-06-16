@@ -18,16 +18,16 @@ These samples leverage [Azure FarmBeats][product_docs] and its corresponding [Py
 
 To run these samples, you must have:
 - Azure subscription - [Create a free account][azure_subscription]
-- AgriFood (FarmBeats) resource - [Install FarmBeats][install_farmbeats]
+- Azure FarmBeats resource - [Install FarmBeats][install_farmbeats]
 - A subscription with one of the supported weather data providers for FarmBeats - [Weather Integration Docs][farmbeats-weather-docs]
-- Azure Machine Learning (AML) Compute Resource - [Create AML Compute][aml-compute-create] (with Python 3.6)
+- Azure Machine Learning (AML) compute resource - [Create AML Compute][aml-compute-create] (with Python 3.6)
 
 ## Features & use case
 
-This project aims to demonstrate following things:
+This project aims to demonstrate following:
 
 ### Creation of farms, boundaries and ingesting satellite & weather data:
-* `sample.ipynb` notebook demonstrates how to create farms, boundaries, and ingestion jobs for satellite and weather data. A satellite ingestion job ingests satellite data (from Sentinel-2) to Azure FarmBeats PaaS data store for a given boundary and duration. Similarly, weather job ingests data into Azure Farmbeats PaaS data store from weather data providers (example: DTN ClearAg, DTN Content Services)
+* [`quick_start.ipynb`](quick_start/quick_start.ipynb) notebook demonstrates how to create farms, boundaries, and ingestion jobs for satellite and weather data. A satellite ingestion job ingests satellite data (from Sentinel-2) to Azure FarmBeats data store for a given area of interest(AOI) and duration. Similarly, weather job ingests data into Azure Farmbeats store from weather data providers (example: DTN ClearAg, DTN Content Services)
 
 ### Build NDVI forecasting model:
 
