@@ -32,12 +32,27 @@ dependencies:
     - tensorflow==2.1.0
     - urllib3==1.25.11
     - xarray==0.16.2
+    - json-logging-py==0.2
+    - json5==0.9.5
+    - jsondiff==1.2.0
+    - jsonpickle==2.0.0
+    - jsonschema==3.2.0
     - jupyter
+    - jupyter-client==6.1.12
+    - jupyter-console==6.4.0
+    - jupyter-core==4.7.1
+    - jupyter-server==1.7.0
+    - jupyter-server-mathjax==0.2.2
+    - jupyter-server-proxy==3.0.2
+    - jupyterlab==2.1.4
+    - jupyterlab-git==0.30.1
+    - jupyterlab-nvdashboard==0.5.0
+    - jupyterlab-server==1.2.0
+    - jupyterlab-widgets==1.0.0
+    - jupytext==1.6.0
     - ipykernel
     - ipython
     - ipython-genutils
     - ipywidgets
-    - jupyterlab==2.1.4
-    - jupyterlab-git==0.30.1
     - requests==2.25.1
     - matplotlib==3.3.4
