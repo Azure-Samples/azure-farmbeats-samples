@@ -10,7 +10,7 @@ urlFragment: ndvi-forecast
 ---
 
 # NDVI Forecast using Azure FarmBeats Python SDK
-In this sample, NDVI forecast model is built using satellite and weather (historical and forecast) datasets, which predicts NDVI for next 10 days in advance for a given Area of Interest (AOI).
+In this sample, a Normalized Difference Vegetation Index (NDVI) forecast model is built using satellite and weather (historical and forecast) datasets, which predicts NDVI for next 10 days in advance for a given Area of Interest (AOI).
 
 
 This sample leverages [Azure FarmBeats][product_docs] and its corresponding [Python SDK][azure-agrifood-farming] and it runs on [Azure Machine Learning Compute][aml-compute].
