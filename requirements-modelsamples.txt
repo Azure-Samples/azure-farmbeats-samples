@@ -21,8 +21,8 @@ seaborn==0.11.1
 shapely==1.7.0
 statsmodels==0.12.2
 tensorboard==2.1.1
-tensorflow==2.1.0
-urllib3==1.25.11
+tensorflow==2.4.0
+urllib3==1.26.5
 xarray==0.16.2
 jupyter
 jupyterlab==2.1.4
