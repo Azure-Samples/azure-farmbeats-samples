@@ -37,6 +37,11 @@ This project aims to demonstrate following:
 ### Steps to run samples and build an NDVI forecasting model
 1. Launch the terminal of AML compute.
 2. Run the following command `git clone https://github.com/Azure-Samples/azure-farmBeats-samples`.
+3. Open Azure Command Line Interface (CLI) and execute following commands to create an environment with all required libraries.
+    <br />a. `cd azure-farmbeats-samples` (Go to azure-farmbeats-samples folder)
+    <br />b. `conda env create -f environment.yml` (Create a new environemt 'farmbeats-sdk-env' with all required packages)
+    <br />c. `conda activate farmbeats-sdk-env`
+    <br />d. `python -m ipykernel install --user --name=farmbeats-sdk-env` (Activate the farmbeats-sdk-env' kernel in AML. Each notebook should select this kernel before running)
 3. Go to `Notebooks` pane and click on folder `azure-farmbeats-samples` under your alias.
 4. Select `compute` and `jupyter kernel` (AzureML(py36)).
 5. Update [`utils/config.py`](ndvi_forecast/utils/config.py) with FarmBeats credentials.
