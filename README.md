@@ -43,7 +43,7 @@ This project aims to demonstrate following:
     <br />c. `conda activate farmbeats-sdk-env`
     <br />d. `python -m ipykernel install --user --name=farmbeats-sdk-env` (Activate the farmbeats-sdk-env' kernel in AML. Each notebook should select this kernel before running)
 3. Go to `Notebooks` pane and click on folder `azure-farmbeats-samples` under your alias.
-4. Select `compute` and `jupyter kernel` (AzureML(py36)).
+4. Select `compute` and `jupyter kernel` (farmbeats-sdk-env).
 5. Update [`utils/config.py`](ndvi_forecast/utils/config.py) with FarmBeats credentials.
 6. Go to folder `ndvi_forecast` and run the notebooks enumerated in the table above starting with `1_download_data.ipynb`.
 
