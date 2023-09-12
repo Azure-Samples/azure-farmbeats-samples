@@ -4,7 +4,7 @@ languages:
 - python
 products:
 - azure
-- azure-farmbeats
+- data-manager-for-agri
 description: "This sample demonstrates how to build a NDVI forecast model using Azure FarmBeats Python SDK."
 urlFragment: ndvi-forecast
 ---
